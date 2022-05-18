@@ -9,7 +9,8 @@
   "dependencies": {
     "vue": "^2.6.14",
     "vue-router": "^3.5.1",
-    "vuex": "^3.6.2"
+    "vuex": "^3.6.2",
+    "relation-graph": "^1.1.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-router": "~5.0.0",
