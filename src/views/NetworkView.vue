@@ -1,5 +1,7 @@
 <template>
   <div>
+    <input type="text" ref="nodeTextInput" @change="updateNodeText">
+    <cropper-image></cropper-image>
     <div style="height: calc(100vh - 50px)">
       <RelationGraph
           ref="RN"
@@ -13,16 +15,28 @@
 
 <script>
 import RelationGraph from 'relation-graph'
+import Vue from 'vue'
+import CropperImage from '@/components/cropper'
 
+let currentNode = null
+let test_text
+let innerHtmlProps = {
+  imageStyle: '',
+  imageUrl: '',
+  textStyle: '',
+  text: ''
+}
 export default {
   name: 'NetworkView',
-  components: { RelationGraph },
+  components: { CropperImage, RelationGraph },
   data () {
     return {
       graphOptions: {
         allowSwitchLineShape: true,
         allowSwitchJunctionPoint: true,
         defaultJunctionPoint: 'border',
+        backgrounImageNoRepeat: true,
+        backgrounImage: require('../assets/top-bg.png'),
         // 这里可以参考"Graph 图谱"中的参数进行设置
       },
       url: [
@@ -31,10 +45,10 @@ export default {
       ],
     }
   },
-
   mounted () {
     this.showRN()
   },
+
   methods: {
     showRN (query) {
       let __graph_json_data = {
@@ -43,24 +57,20 @@ export default {
           {
             id: '0',
             text: '复仇者联盟',
-            color: '#ec6941',
-            borderColor: '#ff875e',
+            color: '#cccccc',
+            borderColor: '#111111',
+            fontColor: '#121212',
             borderWidth: 3,
-            innerHTML:
-                '<div class="c-my-node2" style="background-image: url(' +
-                this.url[0] +
-                ');"><div class="c-node-name2" style="color:#ff875e">复仇者联盟</div></div>',
+            data: { url: this.url[0] }//自定义属性放data里面，防止丢失
           },
           {
             id: '1',
             text: '蚁人',
             color: '#ec6941',
             borderColor: '#ff875e',
+            fontColor: '#121212',
             borderWidth: 3,
-            innerHTML:
-                '<div class="c-my-node2" style="background-image: url(' +
-                this.url[1] +
-                ');"><div class="c-node-name2" style="color:#ff875e">蚁人</div></div>',
+            data: { url: this.url[1] }
           },
         ],
         links: [
@@ -73,6 +83,9 @@ export default {
           }
         ]
       }
+      __graph_json_data.nodes.forEach((value) => {
+        value.innerHTML = this.InnerHtml2String(value.data.url, value.text, value.fontColor)
+      })
       this.$refs.RN.setJsonData(
           __graph_json_data,
           (RN) => {
@@ -82,10 +95,32 @@ export default {
     },
     onNodeClick (nodeObject, $event) {
       console.log('onNodeClick:', nodeObject)
+      this.$refs.nodeTextInput.value = nodeObject.text
+      currentNode = nodeObject
+      this.sliceUrlFromInnerHtml(currentNode.innerHTML)
     },
     onLineClick (lineObject, $event) {
       console.log('onLineClick:', lineObject)
     },
+    updateNodeText (e) {
+      currentNode.text = e.target.value
+      currentNode.innerHTML = this.InnerHtml2String(currentNode.data.url, currentNode.text, currentNode.fontColor)
+    },
+    updateNodePic (e) {
+
+    },
+    updateNodeTextColor (e) {
+
+    },
+
+    //todo 设置默认显示的图片
+    //将url text textColor属性转为innerHtml属性显示
+    InnerHtml2String (url, text, textColor) {
+      return '<div class="c-my-node2" style="background-image: url(' +
+          url +
+          ');"><div class="c-node-name2" style="color:' + textColor + '">' + text + '</div></div>'
+    },
+
   }
 }
 </script>
