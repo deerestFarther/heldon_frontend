@@ -1,8 +1,10 @@
 <template>
   <div>
-    <input type="text" ref="nodeTextInput" @change="updateNodeText">
+    当前选定的结点:
+    <input type="text" :value="currentNode.text" @input="updateNodeText" placeholder="当前未选定结点">
+    <img :src="currentNode.data.url" class="c-my-node2"/>
     <cropper-image></cropper-image>
-    <div style="height: calc(100vh - 50px)">
+    <div style="height: calc(60vh - 50px)">
       <RelationGraph
           ref="RN"
           :options="graphOptions"
@@ -18,8 +20,6 @@ import RelationGraph from 'relation-graph'
 import Vue from 'vue'
 import CropperImage from '@/components/cropper'
 
-let currentNode = null
-let test_text
 let innerHtmlProps = {
   imageStyle: '',
   imageUrl: '',
@@ -43,8 +43,22 @@ export default {
         require('../assets/mv/images_0.jpg'),
         require('../assets/mv/images_1.jpeg'),
       ],
+      currentNode: {
+        text: '',
+        fontColor: '#000000',
+        data: {
+          url: require('../assets/top-bg.png')
+        }
+      },
+      nodeImageStyle: {
+        backgroundImage: 'url(' + require(('../assets/mv/images_0.jpg')) + ')'
+      }
     }
   },
+  computed: {
+
+  },
+
   mounted () {
     this.showRN()
   },
@@ -93,18 +107,17 @@ export default {
           }
       )
     },
+
     onNodeClick (nodeObject, $event) {
       console.log('onNodeClick:', nodeObject)
-      this.$refs.nodeTextInput.value = nodeObject.text
-      currentNode = nodeObject
-      this.sliceUrlFromInnerHtml(currentNode.innerHTML)
+      this.currentNode = nodeObject                  //当前选定的结点
     },
     onLineClick (lineObject, $event) {
       console.log('onLineClick:', lineObject)
     },
     updateNodeText (e) {
-      currentNode.text = e.target.value
-      currentNode.innerHTML = this.InnerHtml2String(currentNode.data.url, currentNode.text, currentNode.fontColor)
+      this.currentNode.text = e.target.value
+      this.currentNode.innerHTML = this.InnerHtml2String(this.currentNode.data.url, this.currentNode.text, this.currentNode.fontColor)
     },
     updateNodePic (e) {
 
@@ -116,9 +129,9 @@ export default {
     //todo 设置默认显示的图片
     //将url text textColor属性转为innerHtml属性显示
     InnerHtml2String (url, text, textColor) {
-      return '<div class="c-my-node2" style="background-image: url(' +
+      return '<img class="c-my-node2" src=' +
           url +
-          ');"><div class="c-node-name2" style="color:' + textColor + '">' + text + '</div></div>'
+          '><div class="c-node-name2" style="color:' + textColor + '">' + text + '</div></img>'
     },
 
   }
@@ -139,7 +152,6 @@ export default {
   width: 160px;
   margin-left: -40px;
   text-align: center;
-  margin-top: 85px;
   position: absolute;
 }
 </style>
