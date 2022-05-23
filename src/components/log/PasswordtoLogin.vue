@@ -1,7 +1,9 @@
 <template>
   <div id="content">
     <div class="left">
-      <img src="../../assets/picture/Qr_code.png">
+      <button class="Qr">
+        <img src="../../assets/picture/Qr_code.png" style="width: 100%">
+      </button>
       <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
         <el-menu-item index="1">密码登录</el-menu-item>
         <el-menu-item index="3">验证码登录</el-menu-item>
@@ -30,6 +32,12 @@
       <el-button type="text">立即注册</el-button>
       <i class="el-icon-right"></i>
       <div style="color: #9c9c9c ;font-size: 12px;margin-top: 5%">使用以下账号直接登录</div>
+      <button class="chose">
+        <img src="../../assets/picture/wechat.png" style="width: 100%">
+      </button>
+      <button class="chose">
+        <img src="../../assets/picture/qq.png" style="width: 100%">
+      </button>
     </div>
   </div>
 </template>
@@ -203,18 +211,32 @@ export default {
   border-color: transparent;
   background-color: transparent;
 }
+
 .el-divider--vertical {
   float: left;
   height: 100%
 }
-img{
+
+.el-icon-right {
+  color: #009c75;
+}
+
+.Qr{
   width: 10%;
   position: absolute;
   left: 5px;
   top: 5px;
+  padding: 0;
+  border: 0;
+  background: white;
 }
-.el-icon-right{
-  color: #009c75;
+
+.chose{
+  margin: 5px 20px;
+  width: 20px;
+  background: white;
+  border: 0;
+  padding: 0;
 }
 
 </style>
