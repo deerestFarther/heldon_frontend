@@ -7,9 +7,7 @@
 <!--      |-->
 <!--      <router-link to="/network">Network</router-link>-->
 <!--    </nav>-->
-<!--    <router-view/>-->
-    <register-background/>
-    <password-to-login/>
+    <router-view/>
   </div>
 </template>
 
@@ -44,9 +42,5 @@ nav {
 }
 </style>
 <script>
-import RegisterBackground from "@/views/RegisterBackground";
-import PasswordToLogin from "@/components/log/PasswordtoLogin";
-export default {
-  components: {PasswordToLogin, RegisterBackground}
-}
+
 </script>

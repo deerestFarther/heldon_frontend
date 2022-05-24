@@ -2,12 +2,24 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import NetworkView from '@/views/NetworkView'
+import Login from "@/views/log/Login.vue";
+import Qr from "@/views/log/Qr";
 
 Vue.use(VueRouter)
 
 const routes = [
   {
     path: '/',
+    name:'login',
+    component: Login
+  },
+  {
+    path:'/qr',
+    name:'qr',
+    component: Qr
+  },
+  {
+    path: '/home',
     name: 'home',
     component: HomeView
   },

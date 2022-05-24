@@ -1,30 +1,57 @@
 <template>
   <div id="content">
+    <div id="log">
     <div class="left">
       <button class="Qr">
-        <img src="../../assets/picture/Qr_code.png" style="width: 100%">
+        <img src="../../assets/picture/Qr_code.png" style="width: 100%" @click="$router.push('/qr')">
       </button>
       <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
-        <el-menu-item index="1">密码登录</el-menu-item>
-        <el-menu-item index="3">验证码登录</el-menu-item>
+        <el-menu-item index="1" @click="handleSwitch1">密码登录</el-menu-item>
+        <el-menu-item index="2" @click="handleSwitch2">验证码登录</el-menu-item>
       </el-menu>
-      <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-        <el-form-item prop="account">
-          <el-input v-model.number="ruleForm.account" placeholder="请输入账号"></el-input>
-        </el-form-item>
-        <el-form-item prop="pass">
-          <el-input type="password" v-model="ruleForm.pass" autocomplete="off" placeholder="请输入密码"></el-input>
-        </el-form-item>
-        <div class="but">
-          <el-radio v-model="radio" label="1">自动登录</el-radio>
-          <el-button type="text">忘记密码</el-button>
-        </div>
-        <div class="submit">
-          <el-form-item>
-            <el-button type="primary" @click="submitForm('ruleForm')">提交</el-button>
+      <div class="password" v-show="switch1">
+        <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+          <el-form-item prop="account">
+            <el-input v-model.number="ruleForm.account" placeholder="请输入账号"></el-input>
           </el-form-item>
-        </div>
-      </el-form>
+          <el-form-item prop="pass">
+            <el-input type="password" v-model="ruleForm.pass" autocomplete="off" placeholder="请输入密码"></el-input>
+          </el-form-item>
+          <div class="but">
+            <el-radio v-model="save" @click="handleSave">自动登录</el-radio>
+            <el-button type="text">忘记密码</el-button>
+          </div>
+          <div class="submit">
+            <el-form-item>
+              <el-button type="primary" @click="submitForm('ruleForm')">登录</el-button>
+            </el-form-item>
+          </div>
+        </el-form>
+      </div>
+      <div class="verification" v-show="switch2">
+        <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+          <el-form-item prop="account">
+            <el-input v-model.number="ruleForm.phone" placeholder="请输入手机号"></el-input>
+          </el-form-item>
+          <el-form-item prop="pass" style="float: left;">
+            <el-input type="password" v-model="ruleForm.verification" autocomplete="off" placeholder="请输入验证码"></el-input>
+          </el-form-item>
+          <button style="float: left;position: absolute;
+    height: 40px;
+    background: #006e55;
+    color: white;
+    border: 0;">获取验证码</button>
+          <div class="but">
+            <el-radio v-model="save" @click="handleSave">自动登录</el-radio>
+            <el-button type="text">忘记密码</el-button>
+          </div>
+          <div class="submit">
+            <el-form-item>
+              <el-button type="primary" @click="submitForm('ruleForm')">登录</el-button>
+            </el-form-item>
+          </div>
+        </el-form>
+      </div>
     </div>
     <el-divider direction="vertical"></el-divider>
     <div class="right">
@@ -39,12 +66,13 @@
         <img src="../../assets/picture/qq.png" style="width: 100%">
       </button>
     </div>
+    </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: "PasswordToLogin",
+  name: "Login",
   data() {
     var checkAccount = (rule, value, callback) => {
       if (!value) {
@@ -60,15 +88,34 @@ export default {
         }
         callback();
       }
+      ;
+    };
+          var checkPhone = (rule, value, callback) => {
+            if (!value) {
+              return callback(new Error('手机号不能为空'));
+            }
+          };
+          var validateVerification = (rule, value, callback) => {
+            if (value === '') {
+              callback(new Error('请输入验证码'));
+            } else {
+              if (this.ruleForm.checkPass !== '') {
+                this.$refs.ruleForm.validateField('checkPass');
+              }
+              callback();
+            }
     };
     return {
-      radio: '1',
+      switch1:true,
+      switch2:false,
+      save: 'false',
       activeIndex: '1',
       activeIndex2: '1',
       ruleForm: {
         pass: '',
-        checkPass: '',
-        age: ''
+        account: '',
+        phone:'',
+        verification:''
       },
       rules: {
         pass: [
@@ -76,7 +123,13 @@ export default {
         ],
         account: [
           {validator: checkAccount, trigger: 'blur'}
-        ]
+        ],
+        phone: [
+            {validator: checkPhone, trigger: 'blur'}
+          ],
+              verification: [
+            {validator: validateVerification, trigger: 'blur'}
+          ]
       }
     };
   },
@@ -94,13 +147,33 @@ export default {
         }
       });
     },
-  }
+    handleSave:function (){
+      this.save="ture";
+      localStorage.setItem('save',this.save);
+      console.log(localStorage.save);
+    },
+    handleSwitch1:function (){
+      this.switch1=true;
+      this.switch2=false;
+    },
+    handleSwitch2:function (){
+      this.switch1=false;
+      this.switch2=true;
+    }
+  },
+
 }
 
 </script>
 
 <style scoped>
 #content {
+  height: 100%;
+  background-image: url("../../assets/picture/background.png");
+  background-repeat: no-repeat;
+  position: relative;
+}
+#log {
   z-index: 1;
   position: absolute;
   background-color: white;
