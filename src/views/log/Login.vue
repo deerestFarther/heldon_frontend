@@ -19,7 +19,7 @@
           </el-form-item>
           <div class="but">
             <el-radio v-model="save" @click="handleSave">自动登录</el-radio>
-            <el-button type="text">忘记密码</el-button>
+            <el-button type="text" @click="$router.push('/register')">忘记密码</el-button>
           </div>
           <div class="submit">
             <el-form-item>
@@ -34,7 +34,7 @@
             <el-input v-model.number="ruleForm.phone" placeholder="请输入手机号"></el-input>
           </el-form-item>
           <el-form-item prop="pass" style="float: left;">
-            <el-input type="password" v-model="ruleForm.verification" autocomplete="off" placeholder="请输入验证码"></el-input>
+            <el-input v-model.number="ruleForm.verification" autocomplete="off" placeholder="请输入验证码"></el-input>
           </el-form-item>
           <button style="float: left;position: absolute;
     height: 40px;
@@ -43,7 +43,7 @@
     border: 0;">获取验证码</button>
           <div class="but">
             <el-radio v-model="save" @click="handleSave">自动登录</el-radio>
-            <el-button type="text">忘记密码</el-button>
+            <el-button type="text" @click="$router.push('/register')">忘记密码</el-button>
           </div>
           <div class="submit">
             <el-form-item>
@@ -56,7 +56,7 @@
     <el-divider direction="vertical"></el-divider>
     <div class="right">
       <div style="color: #9c9c9c;margin-top: 15%">还没有账号</div>
-      <el-button type="text">立即注册</el-button>
+      <el-button type="text" @click="$router.push('/register')">立即注册</el-button>
       <i class="el-icon-right"></i>
       <div style="color: #9c9c9c ;font-size: 12px;margin-top: 5%">使用以下账号直接登录</div>
       <button class="chose">
