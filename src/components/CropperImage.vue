@@ -33,21 +33,23 @@
       <div class="footer-btn">
         <div class="scope-btn">
           <label class="btn" for="uploads">选择封面</label>
-          <input type="file" id="uploads" style="position:absolute; clip:rect(0 0 0 0);" accept="image/png, image/jpeg, image/gif, image/jpg" @change="selectImg($event)">
+          <input type="file" id="uploads" style="position:absolute; clip:rect(0 0 0 0);"
+                 accept="image/png, image/jpeg, image/gif, image/jpg" @change="selectImg($event)">
           <el-button size="mini" type="danger" plain icon="el-icon-zoom-in" @click="changeScale(1)">放大</el-button>
           <el-button size="mini" type="danger" plain icon="el-icon-zoom-out" @click="changeScale(-1)">缩小</el-button>
           <el-button size="mini" type="danger" plain @click="rotateLeft">↺ 左旋转</el-button>
           <el-button size="mini" type="danger" plain @click="rotateRight">↻ 右旋转</el-button>
         </div>
         <div class="upload-btn">
-          <el-button size="mini" type="success" @click="uploadImg('blob')">上传封面 <i class="el-icon-upload"></i></el-button>
+          <el-button size="mini" type="success" @click="uploadImg('blob')">上传封面 <i class="el-icon-upload"></i>
+          </el-button>
         </div>
       </div>
     </div>
     <!--预览效果图-->
     <div class="show-preview">
       <div :style="previews.div" class="preview">
-        <img :src="previews.url" :style="previews.img">
+        <img class="c-my-node2" :src="previews.url" :style="previews.img">
       </div>
     </div>
   </div>
@@ -55,19 +57,20 @@
 
 <script>
 import { VueCropper } from 'vue-cropper'
+import axios from 'axios'
 
 export default {
-  name: "CropperImage",
+  name: 'CropperImage',
   components: {
     VueCropper,
   },
-  props:['Name'],
-  data() {
+  props: ['Name', 'imgUrl'],
+  data () {
     return {
-      name:this.Name,
+      name: this.Name,
       previews: {},
-      option:{
-        img: '',             //裁剪图片的地址
+      option: {
+        img: this.imgUrl,             //裁剪图片的地址
         outputSize: 1,       //裁剪生成图片的质量(可选0.1 - 1)
         outputType: 'png',  //裁剪生成图片的格式（jpeg || png || webp）
         info: true,          //图片大小信息
@@ -89,12 +92,17 @@ export default {
         enlarge: 1,          //图片根据截图框输出比例倍数
         mode: '230px 150px'  //图片默认渲染方式
       },
-    };
+    }
+  },
+  watch: {
+    'imgUrl': function (val) {//props未更新
+      this.option.img = val
+    }
   },
   methods: {
     //初始化函数
     imgLoad (msg) {
-      console.log("工具初始化函数====="+msg)
+      console.log('工具初始化函数=====' + msg)
     },
     //图片缩放
     changeScale (num) {
@@ -119,8 +127,8 @@ export default {
       if (!/\.(jpg|jpeg|png|JPG|PNG)$/.test(e.target.value)) {
         this.$message({
           message: '图片类型要求：jpeg、jpg、png',
-          type: "error"
-        });
+          type: 'error'
+        })
         return false
       }
       //转化为blob
@@ -139,83 +147,91 @@ export default {
     },
     //上传图片
     uploadImg (type) {
-      let _this = this;
+      let _this = this
       if (type === 'blob') {
         //获取截图的blob数据
         this.$refs.cropper.getCropBlob(async (data) => {
-          let formData = new FormData();
-          formData.append('file',data,"DX.jpg")
+          let formData = new FormData()
+          formData.append('file', data, 'DX.jpg')
           //调用axios上传
-          let {data: res} = await _this.$http.post('/api/file/imgUpload', formData)
-          if(res.code === 200){
+          let { data: res } = axios.post('http://localhost:8080/', formData)
+          if (res.code === 200) {
             _this.$message({
               message: res.msg,
-              type: "success"
-            });
-            let data = res.data.replace('[','').replace(']','').split(',');
+              type: 'success'
+            })
+            let data = res.data.replace('[', '').replace(']', '').split(',')
             let imgInfo = {
-              name : _this.Name,
-              url : data[0]
-            };
-            _this.$emit('uploadImgSuccess',imgInfo);
-          }else {
+              name: _this.Name,
+              url: data[0]
+            }
+            _this.$emit('uploadImgSuccess', imgInfo)
+          } else {
             _this.$message({
               message: '文件服务异常，请联系管理员！',
-              type: "error"
-            });
+              type: 'error'
+            })
           }
         })
       }
     },
+
   },
 }
 </script>
 
 <style scoped lang="scss">
-.cropper-content{
+.cropper-content {
   display: flex;
   display: -webkit-flex;
   justify-content: flex-end;
-  .cropper-box{
+
+  .cropper-box {
     flex: 1;
     width: 100%;
-    .cropper{
+
+    .cropper {
       width: auto;
       height: 300px;
     }
   }
 
-  .show-preview{
+  .show-preview {
     flex: 1;
     -webkit-flex: 1;
     display: flex;
     display: -webkit-flex;
     justify-content: center;
-    .preview{
+
+    .preview {
       overflow: hidden;
-      border:1px solid #67c23a;
+      border: 1px solid #67c23a;
       background: #cccccc;
     }
   }
 }
-.footer-btn{
+
+.footer-btn {
   margin-top: 30px;
   display: flex;
   display: -webkit-flex;
   justify-content: flex-end;
-  .scope-btn{
+
+  .scope-btn {
     display: flex;
     display: -webkit-flex;
     justify-content: space-between;
     padding-right: 10px;
   }
-  .upload-btn{
+
+  .upload-btn {
     flex: 1;
     -webkit-flex: 1;
     display: flex;
     display: -webkit-flex;
     justify-content: center;
   }
+
   .btn {
     outline: none;
     display: inline-block;
@@ -239,5 +255,6 @@ export default {
     margin-right: 10px;
   }
 }
+
 </style>
 
