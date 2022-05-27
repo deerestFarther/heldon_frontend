@@ -1,27 +1,99 @@
 <template>
-  <div>
+  <div class="network-box">
 
-    <div v-for="line in currentLineList">
-      text:<input type="text" v-model:value="line.text"></input>
-      fontcolor:<input type="text" v-model:value="line.fontColor"></input>
-      from: <input type="text" v-model:value="line.form"></input>
-      to: <input type="text" v-model:value="line.to"></input>
-      lineWidth:<input type="text" v-model:value="line.lineWidth"></input>
-      lineColor:<input type="text" v-model:value="line.color"></input>
-      lineShape:<input type="text" v-model:value="line.lineShape"></input>
+    <div class="network-data-box">
+      <button @click="addNode">addNode</button>
+
+      <input type="text" ref="currentNodeIdInput" :value="currentNode.id" @input="inputNodeText" @change="changeNodeId"
+             placeholder="当前未选定结点">
+      <img :src="currentNode.data.url" class="c-my-node2"/>
+      <cropper-image :img-url="currentNode.data.url" @imgUploaded="updateNodePic"></cropper-image>
+      以当前结点作为起点的关系
+      <div class="network-data-line" v-for="line in currentLineToList">
+        text:<input type="text" v-model:value="line.text"></input>
+
+        fontcolor:
+        <el-color-picker
+            v-model="line.fontColor"
+            show-alpha
+            :predefine="predefineColors">
+        </el-color-picker>
+        <div>
+          <span>lineWidth</span>
+          <el-slider v-model="line.lineWidth" :max=maxLineWidth></el-slider>
+        </div>
+
+        lineColor:
+        <el-color-picker
+            v-model="line.color"
+            show-alpha
+            :predefine="predefineColors">
+        </el-color-picker>
+      </div>
+      以当前结点作为终点的关系
+      <div class="network-data-line" v-for="line in currentLineFromList">
+        text:<input type="text" v-model:value="line.text"></input>
+
+        fontcolor:
+        <el-color-picker
+            v-model="line.fontColor"
+            show-alpha
+            :predefine="predefineColors">
+        </el-color-picker>
+        <div>
+          <span>lineWidth</span>
+          <el-slider v-model="line.lineWidth" :max=maxLineWidth></el-slider>
+        </div>
+
+        lineColor:
+        <el-color-picker
+            v-model="line.color"
+            show-alpha
+            :predefine="predefineColors">
+        </el-color-picker>
+      </div>
+      <div>
+        to:
+        <el-select v-model="newToNodeId" placeholder="请选择">
+          <el-option
+              v-for="item in nodeOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+              :disabled="item.disabled">
+          </el-option>
+        </el-select>
+        <el-button @click="addLine(currentNode.id,newToNodeId)"></el-button>
+
+        <div>
+          from:
+          <el-select v-model="newFromNodeId" placeholder="请选择">
+            <el-option
+                v-for="item in nodeOptions"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+                :disabled="item.disabled">
+            </el-option>
+          </el-select>
+          <el-button @click="addLine(newFromNodeId, currentNode.id)"></el-button>
+        </div>
+      </div>
     </div>
 
-    <input type="text" :value="currentNode.text" @input="updateNodeText" placeholder="当前未选定结点">
-    <img :src="currentNode.data.url" class="c-my-node2"/>
-    <button @click="addNode">addNode</button>
-    <cropper-image :img-url="currentNode.data.url" @updateNodePic="updateNodePic"></cropper-image>
-    <div style="height: calc(60vh - 50px)">
+
+    <div class="network-graph">
       <RelationGraph
           ref="RN"
           :options="graphOptions"
           :on-node-click="onNodeClick"
           :on-line-click="onLineClick"
-      />
+      >
+        <div slot-scope="{node}" slot="node">
+          <img :src="node.data.url" class="c-my-node2">
+          <div class="c-node-name2">{{ node.text }}</div>
+        </div>
+      </RelationGraph>
     </div>
 
   </div>
@@ -32,12 +104,6 @@ import RelationGraph from 'relation-graph'
 import CropperImage from '@/components/CropperImage'
 import axios from 'axios'
 
-let innerHtmlProps = {
-  imageStyle: '',
-  imageUrl: '',
-  textStyle: '',
-  text: ''
-}
 export default {
   name: 'NetworkView',
   components: { CropperImage, RelationGraph },
@@ -50,6 +116,7 @@ export default {
         defaultJunctionPoint: 'border',
         backgrounImageNoRepeat: true,
         backgrounImage: require('../assets/top-bg.png'),
+        moveToCenterWhenResize: false,
         // 这里可以参考"Graph 图谱"中的参数进行设置
       },
       url: [
@@ -57,64 +124,82 @@ export default {
         require('../assets/mv/images_1.jpeg'),
       ],
       currentNode: {
+        id: '',
         text: '',
         fontColor: '#000000',
         data: {
           url: require('../assets/top-bg.png')
         }
       },
+      maxLineWidth: 10,//线条的最大宽度
       nodeImageStyle: {
         backgroundImage: 'url(' + require('../assets/mv/images_0.jpg') + ')'
       },
-      currentLineList: [],
+      currentLineToList: [], //from为currentNode
+      currentLineFromList: [],//to为currentNode
+      predefineColors: [
+        '#ff4500',
+        '#ff8c00',
+        '#ffd700',
+        '#90ee90',
+        '#00ced1',
+        '#1e90ff',
+        '#c71585',
+        'rgba(255, 69, 0, 0.68)',
+        'rgb(255, 120, 0)',
+        'hsv(51, 100, 98)',
+        'hsva(120, 40, 94, 0.5)',
+        'hsl(181, 100%, 37%)',
+        'hsla(209, 100%, 56%, 0.73)',
+        '#c7158577'
+      ],
+      newToNodeId: '',
+      newFromNodeId: '',
+      nodeOptions: [],
     }
   },
-  computed: {},
 
   mounted () {
     // this.GetNetFromBackEnd(1)
     this.showRN()
+    console.log(this.$refs.RN.getGraphJsonData())
   },
 
   methods: {
     showRN (query) {
       let __graph_json_data = {
-        rootId: '0',
+        rootId: '复仇者联盟',
         nodes: [
           {
-            id: '0',
-            text: '复仇者联盟',
+            id: '复仇者联盟',
+            text: '复仇者联盟',//text==id 用id来作唯一标识，不能为空，不能重名，方便连线
             color: '#cccccc',
             borderColor: '#111111',
             fontColor: '#121212',
             borderWidth: 3,
-            data: { url: this.url[0] }//自定义属性放data里面，防止丢失
+            data: { url: this.url[0], id: 1 }//自定义属性放data里面，防止丢失 url 图片的地址， id 数据库里面的id
           },
           {
-            id: '1',
+            id: '蚁人',
             text: '蚁人',
             color: '#ec6941',
             borderColor: '#ff875e',
             fontColor: '#121212',
             borderWidth: 3,
-            data: { url: this.url[1] }
+            data: { url: this.url[1], id: 2 }
           },
         ],
         links: [       //连线上的文字样式没法改
           {
-            from: '1',
-            to: '0',
+            from: '复仇者联盟',
+            to: '蚁人',
             text: '成员',
             color: '#b2b2b2',
-            lineShape: 2,
             lineWidth: 2,
             fontColor: '#111111',
           }
         ]
       }
-      __graph_json_data.nodes.forEach((value) => {
-        value.innerHTML = this.InnerHtml2String(value.data.url, value.text, value.fontColor)
-      })
       this.$refs.RN.setJsonData(
           __graph_json_data,
           (RN) => {
@@ -124,18 +209,54 @@ export default {
     },
 
     onNodeClick (nodeObject, $event) {
-      console.log('onNodeClick:', nodeObject)
       this.currentNode = nodeObject                  //当前选定的结点
+      this.currentLineToList = []
+      this.currentLineFromList = []
+      this.$refs.RN.getLines().forEach((line) => {//获得与当前结点有关的关系
+        if (line.fromNode.id === nodeObject.id) {//id是string
+          this.currentLineToList.push.apply(this.currentLineToList, line.relations)
+          console.log(line)
+        }
+        if (line.toNode.id === nodeObject.id) {
+          this.currentLineFromList.push.apply(this.currentLineFromList, line.relations)
+          console.log(line)
+        }
+      })
+      this.nodeOptions = []
+      this.$refs.RN.getNodes().forEach((node) => {
+        this.nodeOptions.push({
+          value: node.id,
+          label: node.id,
+          disabled: node.id === nodeObject.id
+        })
+      })
     },
+
     onLineClick (lineObject, $event) {
       console.log('onLineClick:', lineObject)
       this.currentLineList = lineObject.relations
     },
     //必须自己写node的update
-    updateNodeText (e) {
+    inputNodeText (e) {
       this.currentNode.text = e.target.value
-      this.currentNode.innerHTML = this.InnerHtml2String(this.currentNode.data.url, this.currentNode.text, this.currentNode.fontColor)
     },
+    changeNodeId (e) {
+      if (e.target.value === '') {
+        alert('不能为空')
+        this.$refs.currentNodeIdInput.focus()
+        return
+      }
+      if (this.$refs.RN.getNodeById(e.target.value) != null) {
+        console.log(this.$refs.RN.getNodeById(e.target.value))
+        alert('当前结点名已存在')
+        this.$refs.currentNodeIdInput.value = ''
+        this.$refs.currentNodeIdInput.focus()
+        return
+      }
+      this.currentNode.id = e.target.value
+      console.log(this.currentNode)
+    }
+    ,
     updateNodePic (data) {
       this.currentNode.data.url = data
     },
@@ -143,36 +264,48 @@ export default {
 
     },
 
-    addNode () {
+    addNode () {//添加node时，其保证的不是整体id唯一，而是添加所有node的id唯一
+      let _id = this.$refs.RN.getNodes().length.toString()
       let __graph_json_data = {
         nodes: [
           {
-            id: '3',
-            text: '未命名',
+            id: _id,//最好改成先输入结点名再添加结点
+            text: _id,
             color: '#000000',
             borderColor: '#ffffff',
             fontColor: '#000000',
             borderWidth: 3,
-            data: { url: this.url[0] }
+            data: { url: this.url[0], id: '1' }
           }
         ],
         links: []
       }
-      __graph_json_data.nodes.forEach((value) => {
-        value.innerHTML = this.InnerHtml2String(value.data.url, value.text, value.fontColor)
-      })
+      console.log(this.$refs.RN.getGraphJsonData())
       this.$refs.RN.appendJsonData(__graph_json_data, (seeksRGGraph) => {
         // 这些写上当图谱初始化完成后需要执行的代码
+        this.onNodeClick(this.$refs.RN.getNodeById(_id))
+        this.focusNodeById(_id)
+        this.$refs.currentNodeIdInput.focus()
       })
     },
 
-    //todo 设置默认显示的图片
-    //将url text textColor属性转为innerHtml属性显示
-    InnerHtml2String (url, text, textColor) {
-      return '<img class="c-my-node2" src=' +
-          url +
-          '><div class="c-node-name2" style="color:' + textColor + '">' + text + '</div></img>'
+    addLine (fromId, toId) {
+      let __graph_json_data = {
+        nodes: [],
+        links: [
+          {
+            from: fromId,
+            to: toId,
+            text: '',
+          }
+        ]
+      }
+      this.$refs.RN.appendJsonData(__graph_json_data, (seeksRGGraph) => {
+        this.onNodeClick(this.currentNode.id)
+        this.focusNodeById(this.currentNode.id)
+      })
     },
+    //todo 设置默认显示的图片
 
     //通过netId获取后端的关于整个图的数据用于展示
     GetNetFromBackEnd (netId) {
@@ -217,7 +350,6 @@ export default {
                 fontColor: '#111111',
               })
             }
-
             __graph_json_data.nodes.forEach((value) => {//加载完所有node后，设置innnerHtml 实现最终的展示效果
               //todo 不知道为什么获取不到 value.data.url = require(value.data.url)
               value.innerHTML = _this.InnerHtml2String(value.data.url, value.text, value.fontColor)
@@ -232,20 +364,46 @@ export default {
         console.log(err)
       })
 
-    }
+    },
+    focusNodeById (nodeId) {//根据id focus结点
+      this.$refs.RN.focusNodeById(nodeId)
+      this.currentNode = this.$refs.RN.getNodeById(nodeId)
 
+    }
   }
 }
 </script>
 
-<style>
+<style scoped>
+.network-box {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: stretch;
+  align-items: flex-start;
+}
+
+.network-data-box {
+  display: flex;
+  flex-flow: column wrap;
+}
+
+.network-data-line {
+  display: flex;
+  flex-flow: column wrap;
+}
+
+.network-graph {
+  overflow: hidden;
+  height: calc(100vh - 50px);
+}
+
 .c-my-node2 {
   border: none;
   background-position: center center;
   background-size: 100%;
   height: 80px;
   width: 80px;
-  border-radius: 40px;
+  border-radius: 50px;
 }
 
 .c-node-name2 {
@@ -254,5 +412,6 @@ export default {
   text-align: center;
   position: absolute;
 }
+
 
 </style>

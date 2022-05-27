@@ -29,6 +29,12 @@
             @imgLoad="imgLoad">
         </vue-cropper>
       </div>
+      <!--预览效果图-->
+      <div class="show-preview">
+        <div :style="previews.div" class="preview">
+          <img :src="previews.url" :style="previews.img">
+        </div>
+      </div>
       <!--底部操作工具按钮-->
       <div class="footer-btn">
         <div class="scope-btn">
@@ -46,18 +52,14 @@
         </div>
       </div>
     </div>
-    <!--预览效果图-->
-    <div class="show-preview">
-      <div :style="previews.div" class="preview">
-        <img class="c-my-node2" :src="previews.url" :style="previews.img">
-      </div>
-    </div>
+
   </div>
 </template>
 
 <script>
 import { VueCropper } from 'vue-cropper'
 import axios from 'axios'
+import OSS from 'ali-oss'
 
 export default {
   name: 'CropperImage',
@@ -145,35 +147,36 @@ export default {
       //转化为base64
       reader.readAsDataURL(file)
     },
-    //上传图片
-    uploadImg (type) {
-      let _this = this
-      if (type === 'blob') {
-        //获取截图的blob数据
-        this.$refs.cropper.getCropBlob(async (data) => {
-          let formData = new FormData()
-          formData.append('file', data, 'DX.jpg')
-          //调用axios上传
-          let { data: res } = axios.post('http://localhost:8080/', formData)
-          if (res.code === 200) {
-            _this.$message({
-              message: res.msg,
-              type: 'success'
+
+    uploadImg (item) {
+      this.$refs.cropper.getCropBlob(async (data) => {
+            const client = new OSS({
+              region: 'oss-cn-chengdu',
+              accessKeyId: 'LTAI5t8QKarUs4Bccjwgb1FM', // OSS帐号
+              accessKeySecret: 'e6Rf4MyrrTOZ2pZ68fkC3q4U1Vv0Fe', // OSS 密码
+              bucket: 'relation-network' // 阿里云上存储的 Bucket
             })
-            let data = res.data.replace('[', '').replace(']', '').split(',')
-            let imgInfo = {
-              name: _this.Name,
-              url: data[0]
+            let getFileNameUUID = () => {
+              function rx () {
+                return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1)
+              }
+
+              return `${+new Date()}_${rx()}${rx()}`
             }
-            _this.$emit('uploadImgSuccess', imgInfo)
-          } else {
-            _this.$message({
-              message: '文件服务异常，请联系管理员！',
-              type: 'error'
-            })
+            let fileName = getFileNameUUID() + '.png'
+            try {
+              await client.put(fileName, data)
+            } catch (e) {
+              console.log(e)
+            }
+            try {
+              let result = await client.signatureUrl(fileName)
+              this.$emit('imgUploaded', result)
+            } catch (e) {
+              console.log(e)
+            }
           }
-        })
-      }
+      )
     },
 
   },
@@ -184,7 +187,7 @@ export default {
 .cropper-content {
   display: flex;
   display: -webkit-flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
 
   .cropper-box {
     flex: 1;
