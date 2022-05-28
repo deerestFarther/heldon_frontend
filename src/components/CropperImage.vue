@@ -1,6 +1,10 @@
 <template>
   <div class="cropper-content">
-    <div class="cropper-box">
+    <label class="el-icon-edit" for="uploads" v-show="!RD.changeMode">修改图片</label>
+    <input type="file" id="uploads" style="position:absolute; clip:rect(0 0 0 0);"
+           accept="image/png, image/jpeg, image/gif, image/jpg" @change="selectImg($event)">
+
+    <div class="cropper-box" v-if="RD.changeMode">
       <div class="cropper">
         <vue-cropper
             ref="cropper"
@@ -28,31 +32,34 @@
             @realTime="realTime"
             @imgLoad="imgLoad">
         </vue-cropper>
+
       </div>
+
       <!--预览效果图-->
       <div class="show-preview">
         <div :style="previews.div" class="preview">
           <img :src="previews.url" :style="previews.img">
         </div>
       </div>
-      <!--底部操作工具按钮-->
-      <div class="footer-btn">
-        <div class="scope-btn">
-          <label class="btn" for="uploads">选择封面</label>
-          <input type="file" id="uploads" style="position:absolute; clip:rect(0 0 0 0);"
-                 accept="image/png, image/jpeg, image/gif, image/jpg" @change="selectImg($event)">
-          <el-button size="mini" type="danger" plain icon="el-icon-zoom-in" @click="changeScale(1)">放大</el-button>
-          <el-button size="mini" type="danger" plain icon="el-icon-zoom-out" @click="changeScale(-1)">缩小</el-button>
-          <el-button size="mini" type="danger" plain @click="rotateLeft">↺ 左旋转</el-button>
-          <el-button size="mini" type="danger" plain @click="rotateRight">↻ 右旋转</el-button>
-        </div>
-        <div class="upload-btn">
-          <el-button size="mini" type="success" @click="uploadImg('blob')">上传封面 <i class="el-icon-upload"></i>
-          </el-button>
-        </div>
-      </div>
     </div>
 
+
+    <!--底部操作工具按钮-->
+    <div class="footer-btn" v-show="RD.changeMode">
+
+      <div class="scope-btn">
+
+        <el-button size="mini" type="danger" plain icon="el-icon-zoom-in" @click="changeScale(1)">放大</el-button>
+        <el-button size="mini" type="danger" plain icon="el-icon-zoom-out" @click="changeScale(-1)">缩小</el-button>
+        <el-button size="mini" type="danger" plain @click="rotateLeft">↺ 左旋转</el-button>
+        <el-button size="mini" type="danger" plain @click="rotateRight">↻ 右旋转</el-button>
+        <el-button size="mini" type="warning" plain @click="RD.changeMode=!RD.changeMode">取消</el-button>
+      </div>
+      <div class="upload-btn">
+        <el-button size="mini" type="success" @click="RD.changeMode=!uploadImg('blob')">确定<i class="el-icon-upload"></i>
+        </el-button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -84,7 +91,7 @@ export default {
         fixedNumber: [1, 1], //截图框的宽高比例
         full: false,         //false按原比例裁切图片，不失真
         fixedBox: true,      //固定截图框大小，不允许改变
-        canMove: false,      //上传图片是否可以移动
+        canMove: true,      //上传图片是否可以移动
         canMoveBox: true,    //截图框能否拖动
         original: false,     //上传图片按照原始比例渲染
         centerBox: false,    //截图框是否被限制在图片里面
@@ -94,6 +101,10 @@ export default {
         enlarge: 1,          //图片根据截图框输出比例倍数
         mode: '230px 150px'  //图片默认渲染方式
       },
+      RD: {
+        changeMode: false,
+
+      }
     }
   },
   watch: {
@@ -146,6 +157,7 @@ export default {
       }
       //转化为base64
       reader.readAsDataURL(file)
+      this.RD.changeMode = true
     },
 
     uploadImg (item) {
@@ -167,14 +179,24 @@ export default {
             try {
               await client.put(fileName, data)
             } catch (e) {
-              console.log(e)
+              this.$message({
+                message: '图片服务器异常,请联系管理员',
+                type: 'error'
+              })
+
+              return
             }
             try {
               let result = await client.signatureUrl(fileName)
               this.$emit('imgUploaded', result)
             } catch (e) {
-              console.log(e)
+              this.$message({
+                message: '图片服务器异常,请联系管理员',
+                type: 'error'
+              })
+              return
             }
+            this.RD.changeMode = false
           }
       )
     },
@@ -188,30 +210,35 @@ export default {
   display: flex;
   display: -webkit-flex;
   justify-content: flex-start;
+  flex-direction: column;
 
   .cropper-box {
     flex: 1;
+    display: flex;
     width: 100%;
 
     .cropper {
-      width: auto;
-      height: 300px;
+      width: 150px;
+      height: 150px;
+    }
+
+    .show-preview {
+      flex: 1;
+      -webkit-flex: 1;
+      display: flex;
+      display: -webkit-flex;
+      justify-content: center;
+
+      .preview {
+        border-radius: 50%;
+        overflow: hidden;
+        border: 1px solid #67c23a;
+        background: #cccccc;
+      }
     }
   }
 
-  .show-preview {
-    flex: 1;
-    -webkit-flex: 1;
-    display: flex;
-    display: -webkit-flex;
-    justify-content: center;
 
-    .preview {
-      overflow: hidden;
-      border: 1px solid #67c23a;
-      background: #cccccc;
-    }
-  }
 }
 
 .footer-btn {

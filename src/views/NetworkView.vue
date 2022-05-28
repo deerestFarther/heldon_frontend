@@ -2,12 +2,24 @@
   <div class="network-box">
 
     <div class="network-data-box">
-      <button @click="addNode">addNode</button>
+      <NodeIdForm :name-list="nodeIdList" @confirmNodeId="addNode"></NodeIdForm>
 
-      <input type="text" ref="currentNodeIdInput" :value="currentNode.id" @input="inputNodeText" @change="changeNodeId"
-             placeholder="当前未选定结点">
-      <img :src="currentNode.data.url" class="c-my-node2"/>
-      <cropper-image :img-url="currentNode.data.url" @imgUploaded="updateNodePic"></cropper-image>
+      <div class="node-name-box">
+        <el-input type="text" v-model:value="currentNode.text" :disabled="!RD.changeNodeName"
+                  @input="inputNodeText" placeholder="节点名称" maxlength="15" show-word-limit>
+        </el-input>
+        <el-button type="primary" icon="el-icon-edit" circle v-show="!RD.changeNodeName"
+                   @click="RD.changeNodeName=!RD.changeNodeName;RD.originalName=currentNode.text"></el-button>
+        <el-button plain v-show="RD.changeNodeName"
+                   @click="RD.changeNodeName=!RD.changeNodeName;currentNode.text=RD.originalName">取消
+        </el-button>
+        <el-button type="primary" plain v-show="RD.changeNodeName">确定</el-button>
+
+      </div>
+
+      <img class="img-box" :src="currentNode.data.url"/>
+
+      <cropper-image @imgUploaded="updateNodePic"></cropper-image>
       以当前结点作为起点的关系
       <div class="network-data-line" v-for="line in currentLineToList">
         text:<input type="text" v-model:value="line.text"></input>
@@ -102,12 +114,14 @@
 <script>
 import RelationGraph from 'relation-graph'
 import CropperImage from '@/components/CropperImage'
+import NodeIdForm from '@/components/NodeIdForm'
 import axios from 'axios'
 
 export default {
   name: 'NetworkView',
-  components: { CropperImage, RelationGraph },
+  components: { CropperImage, RelationGraph, NodeIdForm },
   data () {
+
     return {
       netId: 1,
       graphOptions: {
@@ -156,6 +170,12 @@ export default {
       newToNodeId: '',
       newFromNodeId: '',
       nodeOptions: [],
+      RD: {
+        changeNodeName: false,
+        originalName: '',
+      },
+      nodeIdList: [],
+
     }
   },
 
@@ -204,6 +224,8 @@ export default {
           __graph_json_data,
           (RN) => {
             //called when the relation-graph is completed
+            this.onNodeClick(RN.getNodeById(__graph_json_data.rootId))
+            this.updateMsg4Cp()
           }
       )
     },
@@ -234,7 +256,6 @@ export default {
 
     onLineClick (lineObject, $event) {
       console.log('onLineClick:', lineObject)
-      this.currentLineList = lineObject.relations
     },
     //必须自己写node的update
     inputNodeText (e) {
@@ -264,13 +285,12 @@ export default {
 
     },
 
-    addNode () {//添加node时，其保证的不是整体id唯一，而是添加所有node的id唯一
-      let _id = this.$refs.RN.getNodes().length.toString()
+    addNode (newNodeId) {//添加node时，其保证的不是整体id唯一，而是添加所有node的id唯一
       let __graph_json_data = {
         nodes: [
           {
-            id: _id,//最好改成先输入结点名再添加结点
-            text: _id,
+            id: newNodeId,//最好改成先输入结点名再添加结点
+            text: newNodeId,
             color: '#000000',
             borderColor: '#ffffff',
             fontColor: '#000000',
@@ -280,12 +300,11 @@ export default {
         ],
         links: []
       }
-      console.log(this.$refs.RN.getGraphJsonData())
       this.$refs.RN.appendJsonData(__graph_json_data, (seeksRGGraph) => {
         // 这些写上当图谱初始化完成后需要执行的代码
-        this.onNodeClick(this.$refs.RN.getNodeById(_id))
-        this.focusNodeById(_id)
-        this.$refs.currentNodeIdInput.focus()
+        this.onNodeClick(this.$refs.RN.getNodeById(newNodeId))
+        this.updateMsg4Cp()
+        this.focusNodeById(newNodeId)
       })
     },
 
@@ -369,12 +388,19 @@ export default {
       this.$refs.RN.focusNodeById(nodeId)
       this.currentNode = this.$refs.RN.getNodeById(nodeId)
 
+    },
+
+    updateMsg4Cp () {
+      this.nodeIdList = []
+      this.$refs.RN.getNodes().forEach(node => {
+        this.nodeIdList.push(node.id)
+      })
     }
   }
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .network-box {
   display: flex;
   flex-flow: row nowrap;
@@ -385,6 +411,24 @@ export default {
 .network-data-box {
   display: flex;
   flex-flow: column wrap;
+  align-items: center;
+  width: 500px;
+
+  .node-name-box {
+    display: flex;
+    flex-flow: row nowrap;
+  }
+
+
+  .img-box {
+    border: none;
+    background-position: center center;
+    background-size: 100%;
+    height: 80px;
+    width: 80px;
+    border-radius: 50px;
+  }
+
 }
 
 .network-data-line {
@@ -395,6 +439,7 @@ export default {
 .network-graph {
   overflow: hidden;
   height: calc(100vh - 50px);
+  width: calc(100vw - 500px);
 }
 
 .c-my-node2 {
