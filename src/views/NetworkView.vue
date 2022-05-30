@@ -20,49 +20,38 @@
       <img class="img-box" :src="currentNode.data.url"/>
 
       <cropper-image @imgUploaded="updateNodePic"></cropper-image>
-      以当前结点作为起点的关系
-      <div class="network-data-line" v-for="line in currentLineToList">
-        text:<input type="text" v-model:value="line.text"></input>
 
-        fontcolor:
+      <div class="node-style-box">
+        背景颜色：
         <el-color-picker
-            v-model="line.fontColor"
-            show-alpha
-            :predefine="predefineColors">
+            v-model="currentNode.color" show-alpha :predefine="predefineColors">
         </el-color-picker>
-        <div>
-          <span>lineWidth</span>
-          <el-slider v-model="line.lineWidth" :max=maxLineWidth></el-slider>
-        </div>
-
-        lineColor:
+        边框颜色：
         <el-color-picker
-            v-model="line.color"
-            show-alpha
-            :predefine="predefineColors">
+            v-model="currentNode.borderColor" show-alpha :predefine="predefineColors">
+        </el-color-picker>
+        文字颜色：
+        <el-color-picker
+            v-model="currentNode.fontColor" show-alpha :predefine="predefineColors">
         </el-color-picker>
       </div>
-      以当前结点作为终点的关系
-      <div class="network-data-line" v-for="line in currentLineFromList">
-        text:<input type="text" v-model:value="line.text"></input>
+      <el-divider></el-divider>
+      <div class="network-data-line-box">
+        以当前结点作为起点的关系
+        <el-tree :data="currentLineToList" :props="relationTreeProps">
+          <div slot-scope="{ node, data }">
+            {{ node.label }}
+          </div>
+        </el-tree>
+      </div>
 
-        fontcolor:
-        <el-color-picker
-            v-model="line.fontColor"
-            show-alpha
-            :predefine="predefineColors">
-        </el-color-picker>
-        <div>
-          <span>lineWidth</span>
-          <el-slider v-model="line.lineWidth" :max=maxLineWidth></el-slider>
-        </div>
-
-        lineColor:
-        <el-color-picker
-            v-model="line.color"
-            show-alpha
-            :predefine="predefineColors">
-        </el-color-picker>
+      <div class="network-data-line-box">
+        以当前结点作为终点的关系
+        <el-tree :data="currentLineFromList" :props="relationTreeProps">
+          <div slot-scope="{ node, data }">
+            {{ node.label }}
+          </div>
+        </el-tree>
       </div>
       <div>
         to:
@@ -169,13 +158,16 @@ export default {
       ],
       newToNodeId: '',
       newFromNodeId: '',
+      relationTreeProps: {
+        label: 'text',
+        children: 'lines',
+      },
       nodeOptions: [],
       RD: {
         changeNodeName: false,
         originalName: '',
       },
       nodeIdList: [],
-
     }
   },
 
@@ -220,9 +212,7 @@ export default {
           }
         ]
       }
-      this.$refs.RN.setJsonData(
-          __graph_json_data,
-          (RN) => {
+      this.$refs.RN.setJsonData(__graph_json_data, (RN) => {
             //called when the relation-graph is completed
             this.onNodeClick(RN.getNodeById(__graph_json_data.rootId))
             this.updateMsg4Cp()
@@ -234,16 +224,22 @@ export default {
       this.currentNode = nodeObject                  //当前选定的结点
       this.currentLineToList = []
       this.currentLineFromList = []
+      console.log(this.$refs.RN.getLines())
       this.$refs.RN.getLines().forEach((line) => {//获得与当前结点有关的关系
         if (line.fromNode.id === nodeObject.id) {//id是string
-          this.currentLineToList.push.apply(this.currentLineToList, line.relations)
-          console.log(line)
+          this.currentLineToList.push({
+            target: line.toNode.id,
+            lines: line.relations,
+          })
         }
         if (line.toNode.id === nodeObject.id) {
-          this.currentLineFromList.push.apply(this.currentLineFromList, line.relations)
-          console.log(line)
+          this.currentLineFromList.push({
+            target: line.toNode.id,
+            lines: line.relations,
+          })
         }
       })
+      console.log(this.currentLineToList)
       this.nodeOptions = []
       this.$refs.RN.getNodes().forEach((node) => {
         this.nodeOptions.push({
@@ -261,23 +257,7 @@ export default {
     inputNodeText (e) {
       this.currentNode.text = e.target.value
     },
-    changeNodeId (e) {
-      if (e.target.value === '') {
-        alert('不能为空')
-        this.$refs.currentNodeIdInput.focus()
-        return
-      }
-      if (this.$refs.RN.getNodeById(e.target.value) != null) {
-        console.log(this.$refs.RN.getNodeById(e.target.value))
-        alert('当前结点名已存在')
-        this.$refs.currentNodeIdInput.value = ''
-        this.$refs.currentNodeIdInput.focus()
-        return
-      }
-      this.currentNode.id = e.target.value
-      console.log(this.currentNode)
-    }
-    ,
+
     updateNodePic (data) {
       this.currentNode.data.url = data
     },
@@ -439,7 +419,7 @@ export default {
 .network-graph {
   overflow: hidden;
   height: calc(100vh - 50px);
-  width: calc(100vw - 500px);
+  width: calc(100vw);
 }
 
 .c-my-node2 {

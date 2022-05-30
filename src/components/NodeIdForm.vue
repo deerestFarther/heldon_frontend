@@ -6,7 +6,7 @@
         <el-form :model="nodeIdForm" status-icon :rules="rules" ref="nodeIdForm" label-width="100px"
                  class="demo-ruleForm">
           <el-form-item label="节点名称" prop="nodeId">
-            <el-input v-model="nodeIdForm.nodeId" autocomplete="off"></el-input>
+            <el-input v-model="nodeIdForm.nodeId" maxlength="15" show-word-limit></el-input>
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="confirmNodeId">提交</el-button>
