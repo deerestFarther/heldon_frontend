@@ -1,6 +1,10 @@
 <template>
   <div class="cropper-content">
-    <div class="cropper-box">
+    <label class="el-icon-edit" for="uploads" v-show="!RD.changeMode">修改图片</label>
+    <input type="file" id="uploads" style="position:absolute; clip:rect(0 0 0 0);"
+           accept="image/png, image/jpeg, image/gif, image/jpg" @change="selectImg($event)">
+
+    <div class="cropper-box" v-if="RD.changeMode">
       <div class="cropper">
         <vue-cropper
             ref="cropper"
@@ -28,26 +32,32 @@
             @realTime="realTime"
             @imgLoad="imgLoad">
         </vue-cropper>
+
       </div>
-      <!--底部操作工具按钮-->
-      <div class="footer-btn">
-        <div class="scope-btn">
-          <label class="btn" for="uploads">选择封面</label>
-          <input type="file" id="uploads" style="position:absolute; clip:rect(0 0 0 0);" accept="image/png, image/jpeg, image/gif, image/jpg" @change="selectImg($event)">
-          <el-button size="mini" type="danger" plain icon="el-icon-zoom-in" @click="changeScale(1)">放大</el-button>
-          <el-button size="mini" type="danger" plain icon="el-icon-zoom-out" @click="changeScale(-1)">缩小</el-button>
-          <el-button size="mini" type="danger" plain @click="rotateLeft">↺ 左旋转</el-button>
-          <el-button size="mini" type="danger" plain @click="rotateRight">↻ 右旋转</el-button>
-        </div>
-        <div class="upload-btn">
-          <el-button size="mini" type="success" @click="uploadImg('blob')">上传封面 <i class="el-icon-upload"></i></el-button>
+
+      <!--预览效果图-->
+      <div class="show-preview">
+        <div :style="previews.div" class="preview">
+          <img :src="previews.url" :style="previews.img">
         </div>
       </div>
     </div>
-    <!--预览效果图-->
-    <div class="show-preview">
-      <div :style="previews.div" class="preview">
-        <img :src="previews.url" :style="previews.img">
+
+
+    <!--底部操作工具按钮-->
+    <div class="footer-btn" v-show="RD.changeMode">
+
+      <div class="scope-btn">
+
+        <el-button size="mini" type="danger" plain icon="el-icon-zoom-in" @click="changeScale(1)">放大</el-button>
+        <el-button size="mini" type="danger" plain icon="el-icon-zoom-out" @click="changeScale(-1)">缩小</el-button>
+        <el-button size="mini" type="danger" plain @click="rotateLeft">↺ 左旋转</el-button>
+        <el-button size="mini" type="danger" plain @click="rotateRight">↻ 右旋转</el-button>
+        <el-button size="mini" type="warning" plain @click="RD.changeMode=!RD.changeMode">取消</el-button>
+      </div>
+      <div class="upload-btn">
+        <el-button size="mini" type="success" @click="RD.changeMode=!uploadImg('blob')">确定<i class="el-icon-upload"></i>
+        </el-button>
       </div>
     </div>
   </div>
@@ -55,19 +65,21 @@
 
 <script>
 import { VueCropper } from 'vue-cropper'
+import axios from 'axios'
+import OSS from 'ali-oss'
 
 export default {
-  name: "CropperImage",
+  name: 'CropperImage',
   components: {
     VueCropper,
   },
-  props:['Name'],
-  data() {
+  props: ['Name', 'imgUrl'],
+  data () {
     return {
-      name:this.Name,
+      name: this.Name,
       previews: {},
-      option:{
-        img: '',             //裁剪图片的地址
+      option: {
+        img: this.imgUrl,             //裁剪图片的地址
         outputSize: 1,       //裁剪生成图片的质量(可选0.1 - 1)
         outputType: 'png',  //裁剪生成图片的格式（jpeg || png || webp）
         info: true,          //图片大小信息
@@ -79,7 +91,7 @@ export default {
         fixedNumber: [1, 1], //截图框的宽高比例
         full: false,         //false按原比例裁切图片，不失真
         fixedBox: true,      //固定截图框大小，不允许改变
-        canMove: false,      //上传图片是否可以移动
+        canMove: true,      //上传图片是否可以移动
         canMoveBox: true,    //截图框能否拖动
         original: false,     //上传图片按照原始比例渲染
         centerBox: false,    //截图框是否被限制在图片里面
@@ -89,12 +101,21 @@ export default {
         enlarge: 1,          //图片根据截图框输出比例倍数
         mode: '230px 150px'  //图片默认渲染方式
       },
-    };
+      RD: {
+        changeMode: false,
+
+      }
+    }
+  },
+  watch: {
+    'imgUrl': function (val) {//props未更新
+      this.option.img = val
+    }
   },
   methods: {
     //初始化函数
     imgLoad (msg) {
-      console.log("工具初始化函数====="+msg)
+      console.log('工具初始化函数=====' + msg)
     },
     //图片缩放
     changeScale (num) {
@@ -119,8 +140,8 @@ export default {
       if (!/\.(jpg|jpeg|png|JPG|PNG)$/.test(e.target.value)) {
         this.$message({
           message: '图片类型要求：jpeg、jpg、png',
-          type: "error"
-        });
+          type: 'error'
+        })
         return false
       }
       //转化为blob
@@ -136,86 +157,111 @@ export default {
       }
       //转化为base64
       reader.readAsDataURL(file)
+      this.RD.changeMode = true
     },
-    //上传图片
-    uploadImg (type) {
-      let _this = this;
-      if (type === 'blob') {
-        //获取截图的blob数据
-        this.$refs.cropper.getCropBlob(async (data) => {
-          let formData = new FormData();
-          formData.append('file',data,"DX.jpg")
-          //调用axios上传
-          let {data: res} = await _this.$http.post('/api/file/imgUpload', formData)
-          if(res.code === 200){
-            _this.$message({
-              message: res.msg,
-              type: "success"
-            });
-            let data = res.data.replace('[','').replace(']','').split(',');
-            let imgInfo = {
-              name : _this.Name,
-              url : data[0]
-            };
-            _this.$emit('uploadImgSuccess',imgInfo);
-          }else {
-            _this.$message({
-              message: '文件服务异常，请联系管理员！',
-              type: "error"
-            });
+
+    uploadImg (item) {
+      this.$refs.cropper.getCropBlob(async (data) => {
+            const client = new OSS({
+              region: 'oss-cn-chengdu',
+              accessKeyId: 'LTAI5t8QKarUs4Bccjwgb1FM', // OSS帐号
+              accessKeySecret: 'e6Rf4MyrrTOZ2pZ68fkC3q4U1Vv0Fe', // OSS 密码
+              bucket: 'relation-network' // 阿里云上存储的 Bucket
+            })
+            let getFileNameUUID = () => {
+              function rx () {
+                return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1)
+              }
+
+              return `${+new Date()}_${rx()}${rx()}`
+            }
+            let fileName = getFileNameUUID() + '.png'
+            try {
+              await client.put(fileName, data)
+            } catch (e) {
+              this.$message({
+                message: '图片服务器异常,请联系管理员',
+                type: 'error'
+              })
+
+              return
+            }
+            try {
+              let result = await client.signatureUrl(fileName)
+              this.$emit('imgUploaded', result)
+            } catch (e) {
+              this.$message({
+                message: '图片服务器异常,请联系管理员',
+                type: 'error'
+              })
+              return
+            }
+            this.RD.changeMode = false
           }
-        })
-      }
+      )
     },
+
   },
 }
 </script>
 
 <style scoped lang="scss">
-.cropper-content{
+.cropper-content {
   display: flex;
   display: -webkit-flex;
-  justify-content: flex-end;
-  .cropper-box{
+  justify-content: flex-start;
+  flex-direction: column;
+
+  .cropper-box {
     flex: 1;
+    display: flex;
     width: 100%;
-    .cropper{
-      width: auto;
-      height: 300px;
+
+    .cropper {
+      width: 150px;
+      height: 150px;
+    }
+
+    .show-preview {
+      flex: 1;
+      -webkit-flex: 1;
+      display: flex;
+      display: -webkit-flex;
+      justify-content: center;
+
+      .preview {
+        border-radius: 50%;
+        overflow: hidden;
+        border: 1px solid #67c23a;
+        background: #cccccc;
+      }
     }
   }
 
-  .show-preview{
-    flex: 1;
-    -webkit-flex: 1;
-    display: flex;
-    display: -webkit-flex;
-    justify-content: center;
-    .preview{
-      overflow: hidden;
-      border:1px solid #67c23a;
-      background: #cccccc;
-    }
-  }
+
 }
-.footer-btn{
+
+.footer-btn {
   margin-top: 30px;
   display: flex;
   display: -webkit-flex;
   justify-content: flex-end;
-  .scope-btn{
+
+  .scope-btn {
     display: flex;
     display: -webkit-flex;
     justify-content: space-between;
     padding-right: 10px;
   }
-  .upload-btn{
+
+  .upload-btn {
     flex: 1;
     -webkit-flex: 1;
     display: flex;
     display: -webkit-flex;
     justify-content: center;
   }
+
   .btn {
     outline: none;
     display: inline-block;
@@ -239,5 +285,6 @@ export default {
     margin-right: 10px;
   }
 }
+
 </style>
 
