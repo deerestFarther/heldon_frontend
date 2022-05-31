@@ -32,7 +32,6 @@
             @realTime="realTime"
             @imgLoad="imgLoad">
         </vue-cropper>
-
       </div>
 
       <!--预览效果图-->
