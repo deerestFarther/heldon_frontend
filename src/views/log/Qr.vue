@@ -29,56 +29,6 @@
 <script>
   export default {
     name: "Qr",
-    data() {
-      var checkAccount = (rule, value, callback) => {
-        if (!value) {
-          return callback(new Error('账号不能为空'));
-        }
-      };
-      var validatePass = (rule, value, callback) => {
-        if (value === '') {
-          callback(new Error('请输入密码'));
-        } else {
-          if (this.ruleForm.checkPass !== '') {
-            this.$refs.ruleForm.validateField('checkPass');
-          }
-          callback();
-        }
-      };
-      return {
-        radio: '1',
-        activeIndex: '1',
-        activeIndex2: '1',
-        ruleForm: {
-          pass: '',
-          checkPass: '',
-          age: ''
-        },
-        rules: {
-          pass: [
-            {validator: validatePass, trigger: 'blur'}
-          ],
-          account: [
-            {validator: checkAccount, trigger: 'blur'}
-          ]
-        }
-      };
-    },
-    methods: {
-      handleSelect(key, keyPath) {
-        console.log(key, keyPath);
-      },
-      submitForm(formName) {
-        this.$refs[formName].validate((valid) => {
-          if (valid) {
-            alert('submit!');
-          } else {
-            console.log('error submit!!');
-            return false;
-          }
-        });
-      },
-    }
 }
 </script>
 

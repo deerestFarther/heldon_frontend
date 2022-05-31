@@ -29,11 +29,11 @@
         </el-form>
       </div>
       <div class="verification" v-show="switch2">
-        <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-          <el-form-item prop="account">
+        <el-form :model="ruleForm1" status-icon :rules="rules1" ref="ruleForm1" label-width="100px" class="demo-ruleForm">
+          <el-form-item prop="phone">
             <el-input v-model.number="ruleForm.phone" placeholder="请输入手机号"></el-input>
           </el-form-item>
-          <el-form-item prop="pass" style="float: left;">
+          <el-form-item prop="verification" style="float: left;">
             <el-input v-model.number="ruleForm.verification" autocomplete="off" placeholder="请输入验证码"></el-input>
           </el-form-item>
           <button style="float: left;position: absolute;
@@ -47,7 +47,7 @@
           </div>
           <div class="submit">
             <el-form-item>
-              <el-button type="primary" @click="submitForm('ruleForm')">登录</el-button>
+              <el-button type="primary" @click="submitForm('ruleForm1')">登录</el-button>
             </el-form-item>
           </div>
         </el-form>
@@ -83,14 +83,13 @@ export default {
       if (value === '') {
         callback(new Error('请输入密码'));
       } else {
-        if (this.ruleForm.checkPass !== '') {
+        if (this.ruleForm.pass !== '') {
           this.$refs.ruleForm.validateField('checkPass');
         }
         callback();
       }
-      ;
     };
-          var checkPhone = (rule, value, callback) => {
+    var checkPhone = (rule, value, callback) => {
             if (!value) {
               return callback(new Error('手机号不能为空'));
             }
@@ -99,8 +98,8 @@ export default {
             if (value === '') {
               callback(new Error('请输入验证码'));
             } else {
-              if (this.ruleForm.checkPass !== '') {
-                this.$refs.ruleForm.validateField('checkPass');
+              if (this.ruleForm1.verification !== '') {
+                this.$refs.ruleForm1.validateField('checkVerification');
               }
               callback();
             }
@@ -114,6 +113,8 @@ export default {
       ruleForm: {
         pass: '',
         account: '',
+      },
+      ruleForm1: {
         phone:'',
         verification:''
       },
@@ -124,12 +125,14 @@ export default {
         account: [
           {validator: checkAccount, trigger: 'blur'}
         ],
+      },
+      rules1: {
         phone: [
-            {validator: checkPhone, trigger: 'blur'}
-          ],
-              verification: [
-            {validator: validateVerification, trigger: 'blur'}
-          ]
+          {validator: checkPhone, trigger: 'blur'}
+        ],
+        verification: [
+          {validator: validateVerification, trigger: 'blur'}
+        ]
       }
     };
   },
@@ -141,6 +144,7 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           alert('submit!');
+          this.$router.push('/main')
         } else {
           console.log('error submit!!');
           return false;
