@@ -1,71 +1,36 @@
 <template>
   <div id="content">
+    <div id="headline">亿网达尽</div>
     <div id="log">
-    <div class="left">
-      <button class="Qr">
-        <img src="../../assets/picture/Qr_code.png" style="width: 100%" @click="$router.push('/qr')">
-      </button>
-      <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
-        <el-menu-item index="1" @click="handleSwitch1">密码登录</el-menu-item>
-        <el-menu-item index="2" @click="handleSwitch2">验证码登录</el-menu-item>
-      </el-menu>
-      <div class="password" v-show="switch1">
-        <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-          <el-form-item prop="account">
-            <el-input v-model.number="ruleForm.account" placeholder="请输入账号"></el-input>
-          </el-form-item>
-          <el-form-item prop="pass">
-            <el-input type="password" v-model="ruleForm.pass" autocomplete="off" placeholder="请输入密码"></el-input>
-          </el-form-item>
-          <div class="but">
-            <el-radio v-model="save" @click="handleSave">自动登录</el-radio>
-            <el-button type="text" @click="$router.push('/register')">忘记密码</el-button>
-          </div>
-          <div class="submit">
-            <el-form-item>
-              <el-button type="primary" @click="submitForm('ruleForm')">登录</el-button>
+      <div class="left">
+        <div class="password">
+          <div style="color: #006e55">登录</div>
+          <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="100px"
+                   class="demo-ruleForm">
+            <el-form-item prop="account">
+              <el-input v-model.number="ruleForm.account" placeholder="请输入账号"></el-input>
             </el-form-item>
-          </div>
-        </el-form>
-      </div>
-      <div class="verification" v-show="switch2">
-        <el-form :model="ruleForm1" status-icon :rules="rules1" ref="ruleForm1" label-width="100px" class="demo-ruleForm">
-          <el-form-item prop="phone">
-            <el-input v-model.number="ruleForm.phone" placeholder="请输入手机号"></el-input>
-          </el-form-item>
-          <el-form-item prop="verification" style="float: left;">
-            <el-input v-model.number="ruleForm.verification" autocomplete="off" placeholder="请输入验证码"></el-input>
-          </el-form-item>
-          <button style="float: left;position: absolute;
-    height: 40px;
-    background: #006e55;
-    color: white;
-    border: 0;">获取验证码</button>
-          <div class="but">
-            <el-radio v-model="save" @click="handleSave">自动登录</el-radio>
-            <el-button type="text" @click="$router.push('/register')">忘记密码</el-button>
-          </div>
-          <div class="submit">
-            <el-form-item>
-              <el-button type="primary" @click="submitForm('ruleForm1')">登录</el-button>
+            <el-form-item prop="pass">
+              <el-input type="password" v-model="ruleForm.pass" autocomplete="off" placeholder="请输入密码"></el-input>
             </el-form-item>
-          </div>
-        </el-form>
+            <div class="but">
+              <el-radio v-model="save" @click="handleSave">自动登录</el-radio>
+              <el-button type="text" @click="$router.push('/register')">忘记密码</el-button>
+            </div>
+            <div class="submit">
+              <el-form-item>
+                <el-button type="primary" @click="submitForm('ruleForm')">登录</el-button>
+              </el-form-item>
+            </div>
+          </el-form>
+        </div>
       </div>
-    </div>
-    <el-divider direction="vertical"></el-divider>
-    <div class="right">
-      <div style="color: #9c9c9c;margin-top: 15%">还没有账号</div>
-      <el-button type="text" @click="$router.push('/register')">立即注册</el-button>
-      <i class="el-icon-right"></i>
-      <div style="color: #9c9c9c ;font-size: 12px;margin-top: 5%">使用以下账号直接登录</div>
-      <button class="chose">
-        <img src="../../assets/picture/wechat.png" style="width: 100%">
-      </button>
-      <button class="chose">
-        <img src="../../assets/picture/qq.png" style="width: 100%">
-      </button>
-    </div>
+      <el-divider direction="vertical"></el-divider>
+      <div class="right">
+        <div style="color: #9c9c9c;margin-top: 20%">还没有账号</div>
+        <el-button type="text" @click="$router.push('/register')">立即注册</el-button>
+        <i class="el-icon-right"></i>
+      </div>
     </div>
   </div>
 </template>
@@ -89,34 +54,11 @@ export default {
         callback();
       }
     };
-    var checkPhone = (rule, value, callback) => {
-            if (!value) {
-              return callback(new Error('手机号不能为空'));
-            }
-          };
-          var validateVerification = (rule, value, callback) => {
-            if (value === '') {
-              callback(new Error('请输入验证码'));
-            } else {
-              if (this.ruleForm1.verification !== '') {
-                this.$refs.ruleForm1.validateField('checkVerification');
-              }
-              callback();
-            }
-    };
     return {
-      switch1:true,
-      switch2:false,
       save: 'false',
-      activeIndex: '1',
-      activeIndex2: '1',
       ruleForm: {
         pass: '',
         account: '',
-      },
-      ruleForm1: {
-        phone:'',
-        verification:''
       },
       rules: {
         pass: [
@@ -126,46 +68,36 @@ export default {
           {validator: checkAccount, trigger: 'blur'}
         ],
       },
-      rules1: {
-        phone: [
-          {validator: checkPhone, trigger: 'blur'}
-        ],
-        verification: [
-          {validator: validateVerification, trigger: 'blur'}
-        ]
-      }
     };
   },
   methods: {
-    handleSelect(key, keyPath) {
-      console.log(key, keyPath);
-    },
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           alert('submit!');
-          this.$router.push('/main')
+          this.$notify({
+            title: '成功',
+            message: '登录',
+            type: 'success'
+          });
+          // window.sessionStorage.setItem("token",token值)
+          this.$router.push('/home')
         } else {
+          this.$notify.error({
+            title: '错误',
+            message: '登录失败'
+          });
           console.log('error submit!!');
           return false;
         }
       });
     },
-    handleSave:function (){
-      this.save="ture";
-      localStorage.setItem('save',this.save);
+    handleSave: function () {
+      this.save = "ture";
+      localStorage.setItem('save', this.save);
       console.log(localStorage.save);
     },
-    handleSwitch1:function (){
-      this.switch1=true;
-      this.switch2=false;
-    },
-    handleSwitch2:function (){
-      this.switch1=false;
-      this.switch2=true;
-    }
   },
-
 }
 
 </script>
@@ -177,6 +109,14 @@ export default {
   background-repeat: no-repeat;
   position: relative;
 }
+
+#headline{
+  font-size: 50px;
+  font-weight: 900;
+  margin-top: 7%;
+  color: #006e55;
+}
+
 #log {
   z-index: 1;
   position: absolute;
@@ -186,28 +126,17 @@ export default {
   left: 0;
   right: 0;
   margin: auto;
-  width: 40%;
-  height: 40%;
-  padding: 4% 3%;
-}
-
-.el-menu-item {
-  padding-left: 30px;
-  padding-right: 30px;
-}
-
-.el-menu--horizontal > .el-menu-item.is-active {
-  border-bottom: 2px solid #006e55;
-  color: #006e55;
-}
-
-.el-menu--horizontal .el-menu-item:not(.is-disabled):focus, .el-menu--horizontal .el-menu-item:not(.is-disabled):hover {
-  outline: 0;
-  color: #006e55;
+  width: 35%;
+  height: 35%;
+  padding: 3% 3%;
 }
 
 .el-form {
   margin-top: 5%
+}
+
+.el-form-item {
+  margin-bottom: 30px;
 }
 
 .left {
@@ -232,7 +161,7 @@ export default {
   left: 0;
   display: flex;
   float: left;
-  margin-right: 62%;
+  margin-right: 58%;
 }
 
 .left /deep/ .el-radio__inner {
@@ -296,24 +225,6 @@ export default {
 
 .el-icon-right {
   color: #009c75;
-}
-
-.Qr{
-  width: 10%;
-  position: absolute;
-  left: 5px;
-  top: 5px;
-  padding: 0;
-  border: 0;
-  background: white;
-}
-
-.chose{
-  margin: 5px 20px;
-  width: 20px;
-  background: white;
-  border: 0;
-  padding: 0;
 }
 
 </style>

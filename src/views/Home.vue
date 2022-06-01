@@ -1,27 +1,33 @@
 <template>
-  <div id="top">
-    <div id="title">亿网达尽</div>
-    <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
-      <el-menu-item index="1">首页</el-menu-item>
-      <el-menu-item index="2">创作</el-menu-item>
-      <el-menu-item index="3">收藏</el-menu-item>
-      <el-menu-item index="4">我的</el-menu-item>
-    </el-menu>
-    <div style="margin-left: 200px">
-      <div class="img_content"/>
-      <div class="username">用户名</div>
-      <div class="return" @click="back">退出</div>
-    </div>
+  <div>
+  <el-container>
+    <el-header>
+      <div id="title">亿网达尽</div>
+      <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect" :router="true">
+        <el-menu-item index="/welcome">首页</el-menu-item>
+        <el-menu-item index="/creation">创作</el-menu-item>
+        <el-menu-item index="/collection">收藏</el-menu-item>
+        <el-menu-item index="/my">我的</el-menu-item>
+      </el-menu>
+      <div style="display: inline-block;">
+        <div class="img_content"/>
+        <div class="username">用户名</div>
+        <div class="return" @click="back">退出</div>
+      </div>
+    </el-header>
+    <el-main>
+      <router-view/>
+    </el-main>
+  </el-container>
   </div>
 </template>
 
 <script>
 export default {
-  name: "Navigation",
+  name: "Home",
   data() {
     return {
-      activeIndex: '1',
-      activeIndex2: '1'
+      activeIndex: '/welcome'
     };
   },
   methods: {
@@ -37,10 +43,6 @@ export default {
 </script>
 
 <style scoped>
-#top{
-  background: white;
-  display: flex;
-}
 #title{
   float: left;
   color: #006e55;
@@ -71,7 +73,7 @@ export default {
   width: 50px;
   border-radius: 100px;
   float: left;
-  margin-top: 5px;
+  margin-top: 7px;
 }
 .username{
   float: left;
@@ -84,5 +86,9 @@ export default {
   line-height: 60px;
   margin-left: 10px;
   font-size: 12px;
+}
+
+.el-card__body, .el-main {
+  padding: 0;
 }
 </style>

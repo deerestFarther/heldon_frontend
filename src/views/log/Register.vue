@@ -1,24 +1,20 @@
 <template>
   <div id="content">
+    <div id="headline">亿网达尽</div>
     <div id="log">
       <div class="left">
-        <button class="Qr">
-          <img src="../../assets/picture/Qr_code.png" style="width: 100%" @click="$router.push('/qr')">
-        </button>
-        <div style="margin: 20px 0 40px 0">注册</div>
+        <div style="color: #006e55">注册</div>
         <div class="verification">
           <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
             <el-form-item prop="account">
-              <el-input v-model.number="ruleForm.phone" placeholder="请输入手机号"></el-input>
+              <el-input v-model="ruleForm.age" placeholder="请输入账号"></el-input>
             </el-form-item>
-            <el-form-item prop="pass" style="float: left;">
-              <el-input v-model.number="ruleForm.verification" autocomplete="off" placeholder="请输入验证码"></el-input>
+            <el-form-item prop="pass">
+              <el-input type="password" v-model="ruleForm.pass" autocomplete="off" placeholder="请输入密码"></el-input>
             </el-form-item>
-            <button style="float: left;position: absolute;
-    height: 40px;
-    background: #006e55;
-    color: white;
-    border: 0;">获取验证码</button>
+            <el-form-item prop="checkPass">
+              <el-input type="password" v-model="ruleForm.checkPass" autocomplete="off" placeholder="请确认密码"></el-input>
+            </el-form-item>
             <div class="submit">
               <el-form-item>
                 <el-button type="primary" @click="submitForm('ruleForm')">注册</el-button>
@@ -29,16 +25,9 @@
       </div>
       <el-divider direction="vertical"></el-divider>
       <div class="right">
-        <div style="color: #9c9c9c;margin-top: 15%">已有账号</div>
+        <div style="color: #9c9c9c;margin-top: 20%">已有账号</div>
         <el-button type="text" @click="$router.push('/')">直接登录</el-button>
         <i class="el-icon-right"></i>
-        <div style="color: #9c9c9c ;font-size: 12px;margin-top: 5%">使用以下账号直接登录</div>
-        <button class="chose">
-          <img src="../../assets/picture/wechat.png" style="width: 100%">
-        </button>
-        <button class="chose">
-          <img src="../../assets/picture/qq.png" style="width: 100%">
-        </button>
       </div>
     </div>
   </div>
@@ -48,14 +37,14 @@
 export default {
   name: "Register",
   data() {
-    var checkPhone = (rule, value, callback) => {
+    var checkAccount = (rule, value, callback) => {
       if (!value) {
-        return callback(new Error('手机号不能为空'));
+        return callback(new Error('账号不能为空'));
       }
     };
-    var validateVerification = (rule, value, callback) => {
+    var validatePass = (rule, value, callback) => {
       if (value === '') {
-        callback(new Error('请输入验证码'));
+        callback(new Error('请输入密码'));
       } else {
         if (this.ruleForm.checkPass !== '') {
           this.$refs.ruleForm.validateField('checkPass');
@@ -63,18 +52,31 @@ export default {
         callback();
       }
     };
+    var validatePass2 = (rule, value, callback) => {
+      if (value === '') {
+        callback(new Error('请再次输入密码'));
+      } else if (value !== this.ruleForm.pass) {
+        callback(new Error('两次输入密码不一致!'));
+      } else {
+        callback();
+      }
+    };
     return {
       save: 'false',
       ruleForm: {
-        phone: '',
-        verification: ''
+        pass: '',
+        checkPass: '',
+        account: ''
       },
       rules: {
-        phone: [
-          {validator: checkPhone, trigger: 'blur'}
+        pass: [
+          { validator: validatePass, trigger: 'blur' }
         ],
-        verification: [
-          {validator: validateVerification, trigger: 'blur'}
+        checkPass: [
+          { validator: validatePass2, trigger: 'blur' }
+        ],
+        account: [
+          { validator: checkAccount, trigger: 'blur' }
         ]
       }
     };
@@ -93,21 +95,7 @@ export default {
         }
       });
     },
-    handleSave: function () {
-      this.save = "ture";
-      localStorage.setItem('save', this.save);
-      console.log(localStorage.save);
-    },
-    handleSwitch1: function () {
-      this.switch1 = true;
-      this.switch2 = false;
-    },
-    handleSwitch2: function () {
-      this.switch1 = false;
-      this.switch2 = true;
-    }
   },
-
 }
 
 </script>
@@ -120,6 +108,13 @@ export default {
   position: relative;
 }
 
+#headline{
+  font-size: 50px;
+  font-weight: 900;
+  margin-top: 7%;
+  color: #006e55;
+}
+
 #log {
   z-index: 1;
   position: absolute;
@@ -129,9 +124,9 @@ export default {
   left: 0;
   right: 0;
   margin: auto;
-  width: 40%;
-  height: 40%;
-  padding: 4% 3%;
+  width: 35%;
+  height: 35%;
+  padding: 3% 3%;
 }
 
 .el-form {
@@ -156,13 +151,8 @@ export default {
   border-right: 0;
 }
 
-.submit{
-  margin-top: 80px;
-}
-
 .submit /deep/ .el-button {
   width: 100%;
-  margin-top: 20px;
 }
 
 .submit /deep/ .el-button--primary {
@@ -198,24 +188,6 @@ export default {
 
 .el-icon-right {
   color: #009c75;
-}
-
-.Qr {
-  width: 10%;
-  position: absolute;
-  left: 5px;
-  top: 5px;
-  padding: 0;
-  border: 0;
-  background: white;
-}
-
-.chose {
-  margin: 5px 20px;
-  width: 20px;
-  background: white;
-  border: 0;
-  padding: 0;
 }
 
 </style>
