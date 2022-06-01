@@ -1,14 +1,12 @@
 <template>
   <div id="content">
-    <navigation/>
+    首页+搜索（陈子涵）
   </div>
 </template>
 
 <script>
-import Navigation from "@/components/Navigation";
 export default {
-  name: "Home",
-  components: {Navigation}
+  name: "Welcome"
 }
 </script>
 

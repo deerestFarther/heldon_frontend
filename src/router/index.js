@@ -3,23 +3,25 @@ import VueRouter from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import NetworkView from '@/views/NetworkView'
 import Login from "@/views/log/Login.vue";
-import Qr from "@/views/log/Qr";
 import Register from "@/views/log/Register";
-import Home from "@/views/home/Home";
+import Home from "@/views/Home";
+import Welcome from "@/views/home/welcome/Welcome";
+import Creation from "@/views/home/creation/Creation";
+import Collection from "@/views/home/collection/Collection";
+import My from "@/views/home/my/My"
 
 
 Vue.use(VueRouter)
 
 const routes = [
   {
+    path: '/',
+    redirect:'/home'
+  },
+  {
     path: '/login',
     name:'login',
     component: Login
-  },
-  {
-    path:'/qr',
-    name:'qr',
-    component: Qr
   },
   {
     path: '/register',
@@ -27,13 +29,26 @@ const routes = [
     component: Register
   },
   {
-    path: '/',
-    name:'home',
-    component: Home
+    path: '/home',
+    component: Home,
+    redirect:'/welcome',
+    children:[{
+      path: '/welcome',
+      component: Welcome
+    },{
+      path: '/creation',
+      component: Creation
+    },{
+      path:'/collection',
+      component: Collection
+    },{
+      path:'/my',
+      component: My
+    }]
   },
   {
-    path: '/home',
-    name: 'home',
+    path: '/home-view',
+    name: 'home-view',
     component: HomeView
   },
   {
@@ -56,5 +71,13 @@ const routes = [
 const router = new VueRouter({
   routes
 })
+
+//挂载路由导航守卫
+// router.beforeEach((to, from, next) => {
+//   if(to.path==='/login') return next();
+//   const  tokenStr =window.sessionStorage.getItem('token')
+//   if(!tokenStr) return  next('/login')
+//   next()
+// })
 
 export default router
