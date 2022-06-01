@@ -4,12 +4,15 @@ import HomeView from '../views/HomeView.vue'
 import NetworkView from '@/views/NetworkView'
 import Login from "@/views/log/Login.vue";
 import Qr from "@/views/log/Qr";
+import Register from "@/views/log/Register";
+import Home from "@/views/home/Home";
+
 
 Vue.use(VueRouter)
 
 const routes = [
   {
-    path: '/',
+    path: '/login',
     name:'login',
     component: Login
   },
@@ -17,6 +20,16 @@ const routes = [
     path:'/qr',
     name:'qr',
     component: Qr
+  },
+  {
+    path: '/register',
+    name:'register',
+    component: Register
+  },
+  {
+    path: '/',
+    name:'home',
+    component: Home
   },
   {
     path: '/home',

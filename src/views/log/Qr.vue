@@ -5,12 +5,14 @@
         <button class="Qr">
           <img src="../../assets/picture/login.png" style="width: 100%" @click="$router.push('/')">
         </button>
-        <div>扫码登录</div>
+        <div style="margin-bottom: 20px">扫码登录</div>
+        <img src="../../assets/picture/Qr_code.png">
+        <div style="margin-top: 20px;font-size: 12px">打开 微信APP 进行扫码登录</div>
       </div>
       <el-divider direction="vertical"></el-divider>
       <div class="right">
         <div style="color: #9c9c9c;margin-top: 15%">还没有账号</div>
-        <el-button type="text">立即注册</el-button>
+        <el-button type="text" @click="$router.push('/register')">立即注册</el-button>
         <i class="el-icon-right"></i>
         <div style="color: #9c9c9c ;font-size: 12px;margin-top: 5%">使用以下账号直接登录</div>
         <button class="chose">
@@ -27,56 +29,6 @@
 <script>
   export default {
     name: "Qr",
-    data() {
-      var checkAccount = (rule, value, callback) => {
-        if (!value) {
-          return callback(new Error('账号不能为空'));
-        }
-      };
-      var validatePass = (rule, value, callback) => {
-        if (value === '') {
-          callback(new Error('请输入密码'));
-        } else {
-          if (this.ruleForm.checkPass !== '') {
-            this.$refs.ruleForm.validateField('checkPass');
-          }
-          callback();
-        }
-      };
-      return {
-        radio: '1',
-        activeIndex: '1',
-        activeIndex2: '1',
-        ruleForm: {
-          pass: '',
-          checkPass: '',
-          age: ''
-        },
-        rules: {
-          pass: [
-            {validator: validatePass, trigger: 'blur'}
-          ],
-          account: [
-            {validator: checkAccount, trigger: 'blur'}
-          ]
-        }
-      };
-    },
-    methods: {
-      handleSelect(key, keyPath) {
-        console.log(key, keyPath);
-      },
-      submitForm(formName) {
-        this.$refs[formName].validate((valid) => {
-          if (valid) {
-            alert('submit!');
-          } else {
-            console.log('error submit!!');
-            return false;
-          }
-        });
-      },
-    }
 }
 </script>
 
