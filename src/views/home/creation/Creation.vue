@@ -1,10 +1,10 @@
 <template>
   <div id="content">
     <el-container>
-      <el-aside width="20%" style="margin:5% 0 0 6%">
+      <el-aside width="20%" style="margin:5% 0 0 6%;height: 615px;">
         <user-picture/>
       </el-aside>
-      <el-main class="main">创作+单张查看（吴恒）</el-main>
+      <el-main class="main"></el-main>
     </el-container>
   </div>
 </template>
