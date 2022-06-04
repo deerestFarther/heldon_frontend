@@ -61,6 +61,7 @@ import { VueCropper } from 'vue-cropper'
 import axios from 'axios'
 import OSS from 'ali-oss'
 
+//todo 图片加载有问题
 export default {
   name: 'CropperImage',
   components: {
@@ -136,6 +137,7 @@ export default {
       //转化为blob
       let reader = new FileReader()
       reader.onload = (e) => {
+        console.log(e)
         let data
         if (typeof e.target.result === 'object') {
           data = window.URL.createObjectURL(new Blob([e.target.result]))
@@ -143,6 +145,9 @@ export default {
           data = e.target.result
         }
         this.option.img = data
+      }
+      reader.onerror = (e) => {
+        console.log(e)
       }
       //转化为base64
       reader.readAsDataURL(file)
