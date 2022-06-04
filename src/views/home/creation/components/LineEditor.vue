@@ -122,17 +122,17 @@ export default {
         '#c7158577'
       ],
       lineShapeOptions: [
-        { value: '1', label: '直线' },
-        { value: '2', label: '简洁' },
-        { value: '3', label: '生动' },
-        { value: '4', label: '鱼尾' },
-        { value: '5', label: '折线' },
+        { value: 1, label: '直线' },
+        { value: 2, label: '简洁' },
+        { value: 3, label: '生动' },
+        { value: 4, label: '鱼尾' },
+        { value: 5, label: '折线' },
       ],
       curLine: {},
       newLineForm: {
         text: '',
         fontColor: '#111111',
-        lineShape: '1',
+        lineShape: 1,
         color: '#aaaaaa',
         lineWidth: 1,
         content: '',

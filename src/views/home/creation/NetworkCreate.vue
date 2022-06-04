@@ -40,7 +40,7 @@ export default {
       netId: 2,
       rootNodeId: '',
       graphOptions: {
-        allowSwitchLineShape: true,
+        allowSwitchLineShape: false,
         allowSwitchJunctionPoint: true,
         defaultJunctionPoint: 'border',
         backgrounImageNoRepeat: true,
@@ -296,7 +296,7 @@ export default {
                 from: mp.get(data[i].nodeIdFrom),
                 to: mp.get(data[i].nodeIdTo),
                 fontColor: data[i].fontColor,
-                lineShape: data[i].lineShape,
+                lineShape: parseInt(data[i].lineShape),
                 text: data[i].text,
                 lineWidth: data[i].lineWidth,
                 color: data[i].color,
