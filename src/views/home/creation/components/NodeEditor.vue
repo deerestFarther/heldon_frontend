@@ -1,11 +1,11 @@
 <template>
 
   <div class="node-edit-box">
-    <!-- todo 保存布局-->
-
+    <el-button type="primary" @click="updateNodeXY">保存布局</el-button>
     <el-button class="node-edit-btn" type="primary" icon="el-icon-edit" circle
                @click="changeNode(currentNode)"></el-button>
-    <el-button type="danger" icon="el-icon-delete" circle @click="deleteNode(currentNode)"></el-button>
+    <el-button type="danger" icon="el-icon-delete" circle @click="deleteNode(currentNode)"
+               v-if="currentNode.data.ableDelete"></el-button>
     <img class="img-box" :src="currentNode.data.url"/>
     <div class="node-name-box">
       {{ currentNode.id }}
@@ -211,6 +211,9 @@ export default {
               })
         }
       })
+    },
+    updateNodeXY(){
+      this.$emit('updateNodeXY');
     }
   },
   mounted () {

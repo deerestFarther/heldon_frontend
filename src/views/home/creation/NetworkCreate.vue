@@ -4,7 +4,7 @@
     <div class="network-data-box">
       <el-divider></el-divider>
       <node-editor :current-node="currentNode" :id-list="idList" :net-id="netId"
-                   @nodeUpdated="nodeDataUpdate"></node-editor>
+                   @nodeUpdated="nodeDataUpdate" @updateNodeXY="updateNodeList"></node-editor>
       <el-divider></el-divider>
       <line-editor :currentLineToList="currentLineToList" :currentLineFromList="currentLineFromList"
                    :nodeOptions="nodeOptions" :currentNode="currentNode"
@@ -37,7 +37,7 @@ export default {
   components: { LineEditor, NodeEditor, RelationGraph, NodeIdForm },
   data () {
     return {
-      netId: 2,
+      netId: null,
       rootNodeId: '',
       graphOptions: {
         allowSwitchLineShape: false,
@@ -71,6 +71,8 @@ export default {
   },
 
   mounted () {
+    this.netId = this.$route.params.netId
+    console.log(this.netId)
     this.GetNetFromBackEnd(this.netId)
     // this.showRN()
   },
@@ -175,41 +177,19 @@ export default {
         })
       })
     },
-    loadLastNodeList () {
-      this.lastNodeList.forEach((lastNode) => {
-        let node = this.$refs.RN.getNodeById(lastNode.id)
-        node.borderColor = lastNode.borderColor
-        node.color = lastNode.color
-        node.data.url = lastNode.data.url
-        node.data.content = lastNode.data.content
-        node.fontColor = lastNode.fontColor
-        node.id = lastNode.id
-        node.text = lastNode.text
-        node.x = lastNode.x
-        node.y = lastNode.y
-      })
-    },
-    async updateNodeList () {
+    updateNodeList () {
       let list = []
       this.$refs.RN.getNodes().forEach((node) => {
         list.push({
-          nodeName: node.id,
-          id: node.id,
-          text: node.text,
-          color: node.color,
-          borderColor: node.borderColor,
-          fontColor: node.fontColor,
-          content: node.data.content,
           nodeId: node.data.id,
           x: node.x,
           y: node.y,
-          url: node.data.url,
         })
       })
-      await axios.put('http://localhost:8080/node/updateNodeList', { netId: this.netId, nodeDTOList: list }
-      ).then((res) => {
-        //更新成功
-      }).catch((err) => {
+      axios.put('http://localhost:8080/node/updateNodeList', list)
+          .then((res) => {
+            //更新成功
+          }).catch((err) => {
         console.log(err)
       })
     },

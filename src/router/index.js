@@ -62,7 +62,7 @@ const routes = [
     }
   },
   {
-    path: '/networkCreate',
+    path: '/networkCreate/:netId',
     name: 'networkCreate',
     component: NetworkCreate
   },
