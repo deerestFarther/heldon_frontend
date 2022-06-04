@@ -1,48 +1,66 @@
 <template>
-
   <div class="node-edit-box">
-    <el-button type="primary" @click="updateNodeXY">保存布局</el-button>
-    <el-button class="node-edit-btn" type="primary" icon="el-icon-edit" circle
-               @click="changeNode(currentNode)"></el-button>
-    <el-button type="danger" icon="el-icon-delete" circle @click="deleteNode(currentNode)"
-               v-if="currentNode.data.ableDelete"></el-button>
-    <img class="img-box" :src="currentNode.data.url"/>
-    <div class="node-name-box">
-      {{ currentNode.id }}
-    </div>
-    <div class="node-content-box">
-      {{ currentNode.data.content }}
-    </div>
+    <div style="font-size: 24px;font-weight: 900;margin-bottom: 20px">结点编辑</div>
     <div>
-      字体颜色 <i class="el-icon-s-flag" :style="{'color':currentNode.fontColor}"/>
-    </div>
+      <img class="img-box" :src="currentNode.data.url"/>
+      <div style="float: left;margin-left: 20px;width: 63%;">
+        <el-descriptions :column="1">
+          <el-descriptions-item label="结点名称">{{ currentNode.id }}</el-descriptions-item>
+          <el-descriptions-item label="结点信息">{{ currentNode.data.content }}</el-descriptions-item>
+        </el-descriptions>
+      </div>
+  </div>
     <div>
-      边框颜色 <i class="el-icon-s-flag" :style="{'color':currentNode.borderColor}"/>
+      <div class="node-edit-color">
+        字体颜色 <i class="el-icon-s-flag" :style="{'color':currentNode.fontColor}"/>
+      </div>
+      <div class="node-edit-color">
+        边框颜色 <i class="el-icon-s-flag" :style="{'color':currentNode.borderColor}"/>
+      </div>
+      <div class="node-edit-color">
+        背景颜色 <i class="el-icon-s-flag" :style="{'color':currentNode.color}"/>
+      </div>
     </div>
-    <div>
-      背景颜色 <i class="el-icon-s-flag" :style="{'color':currentNode.color}"/>
-    </div>
+    <el-row>
+      <el-tooltip class="item" effect="dark" content="删除结点" placement="bottom">
+        <el-button type="danger" icon="el-icon-delete" circle v-if="currentNode.data.ableDelete" @click="deleteNode(currentNode)"></el-button>
+      </el-tooltip>
+      <el-tooltip class="item" effect="dark" content="编辑结点" placement="bottom">
+        <el-button type="primary" icon="el-icon-edit" circle @click="changeNode(currentNode)"></el-button>
+      </el-tooltip>
+      <el-tooltip class="item" effect="dark" content="添加结点" placement="bottom">
+        <el-button type="warning" icon="el-icon-plus" circle @click="newNodeDialogVisible=true"></el-button>
+      </el-tooltip>
+      <el-tooltip class="item" effect="dark" content="保存布局" placement="bottom">
+        <el-button type="success" icon="el-icon-check" circle @click="updateNodeXY"></el-button>
+      </el-tooltip>
+    </el-row>
+
     <el-dialog title="修改结点信息" :visible.sync="dialogVisible" width="30%" :close-on-click-modal=false>
       <el-form :model="curNode" :rules="rules" :ref="curNode">
-        <img class="img-box" :src="curNode.url"/>
-        <cropper-image @imgUploaded="updateNodePic($event, curNode)"></cropper-image>
+        <img class="img-box" :src="curNode.url" v-show="msgFormSon" style="margin-bottom: 10px;float: inherit;"/>
+        <cropper-image @imgUploaded="updateNodePic($event, curNode)" @func="getMsgFormSon" style="margin-bottom: 10px;"></cropper-image>
+        <div style="height: 80px">
+          <div class="node-edit-color" style="margin: 22px;">
+            字体颜色 <el-color-picker v-model="curNode.fontColor" show-alpha :predefine="predefineColors"/>
+          </div>
+          <div class="node-edit-color" style="margin: 22px;">
+            背景颜色 <el-color-picker v-model="curNode.color" show-alpha :predefine="predefineColors"/>
+          </div>
+          <div class="node-edit-color" style="margin: 22px;">
+            边框颜色 <el-color-picker v-model="curNode.borderColor" show-alpha :predefine="predefineColors"/>
+          </div>
+        </div>
         <el-form-item prop="id">
-          <el-input v-model="curNode.id" :maxlength=15 show-word-limit></el-input>
+          <el-input v-model="curNode.id" :maxlength=15 show-word-limit placeholder="请输入结点名称"></el-input>
         </el-form-item>
-        字体颜色
-        <el-color-picker v-model="curNode.fontColor" show-alpha :predefine="predefineColors"/>
-        背景颜色
-        <el-color-picker v-model="curNode.color" show-alpha :predefine="predefineColors"/>
-        边框颜色
-        <el-color-picker v-model="curNode.borderColor" show-alpha :predefine="predefineColors"/>
         <el-form-item prop="content">
-          <el-input type="textarea" :rows="2" placeholder="请输入内容" v-model="curNode.content"></el-input>
+          <el-input type="textarea" :rows="2" placeholder="请输入结点信息" v-model="curNode.content"></el-input>
         </el-form-item>
         <el-button type="primary" @click="confirmChangeNode(currentNode)">提交</el-button>
         <el-button @click="cancelChangeNode">取消</el-button>
       </el-form>
     </el-dialog>
-    <el-button type="primary" @click="newNodeDialogVisible=true">添加结点</el-button>
 
     <el-dialog title="添加新结点" :visible.sync="newNodeDialogVisible" width="30%" :close-on-click-modal=false>
       <el-form :model="newNodeForm" :rules="rules" ref="newNodeForm">
@@ -126,6 +144,7 @@ export default {
       },
       dialogVisible: false,
       newNodeDialogVisible: false,
+      msgFormSon: true,
       newNodeForm: {
         id: '',//上传的时候把text加上
         url: '',
@@ -214,12 +233,15 @@ export default {
     },
     updateNodeXY(){
       this.$emit('updateNodeXY');
+    },
+    getMsgFormSon(data){
+      this.msgFormSon = data
+      console.log(this.msgFormSon)
     }
   },
   mounted () {
     console.log(this.currentNode)
   },
-
 }
 </script>
 
@@ -229,6 +251,7 @@ export default {
   display: flex;
   flex-flow: column wrap;
   align-items: center;
+  margin: 15px;
 
   .node-edit-btn-box {
     align-self: flex-end;
@@ -246,9 +269,17 @@ export default {
     border: none;
     background-position: center center;
     background-size: 100%;
-    height: 80px;
-    width: 80px;
+    height: 100px;
+    width: 100px;
     border-radius: 50px;
+    float: left;
   }
+}
+
+.node-edit-color{
+  float: left;
+  margin: 12px;
+  display: flex;
+  align-items: center;
 }
 </style>

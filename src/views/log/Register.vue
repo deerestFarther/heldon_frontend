@@ -7,7 +7,7 @@
         <div class="verification">
           <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
             <el-form-item prop="account">
-              <el-input v-model="ruleForm.age" placeholder="请输入账号"></el-input>
+              <el-input v-model="ruleForm.account" placeholder="请输入用户名"></el-input>
             </el-form-item>
             <el-form-item prop="pass">
               <el-input type="password" v-model="ruleForm.pass" autocomplete="off" placeholder="请输入密码"></el-input>
@@ -34,22 +34,35 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "Register",
   data() {
     var checkAccount = (rule, value, callback) => {
+      console.log(value)
       if (!value) {
-        return callback(new Error('账号不能为空'));
+        return callback(new Error('用户名不能为空'));
+      }else{
+        if(value.length<2||value.length>6){
+          return callback(new Error('用户名长度为2~6位'))
+        }else {
+          return callback()
+        }
       }
     };
     var validatePass = (rule, value, callback) => {
       if (value === '') {
-        callback(new Error('请输入密码'));
+        callback(new Error('密码不能为空'));
       } else {
-        if (this.ruleForm.checkPass !== '') {
-          this.$refs.ruleForm.validateField('checkPass');
+        if(value.length<4||value.length>12){
+          callback(new Error('密码长度为4~12位'));
+        }else {
+          if (this.ruleForm.checkPass !== '') {
+            this.$refs.ruleForm.validateField('checkPass');
+          }
+          callback();
         }
-        callback();
       }
     };
     var validatePass2 = (rule, value, callback) => {
@@ -88,9 +101,32 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          alert('submit!');
+          axios.post("http://www.pandub.cn:8080/authorization/add/authorization/new/"+0+"&&"+this.ruleForm.account
+          +"&&"+this.ruleForm.pass).then(({data})=> {
+            console.log(data)
+            if(data){
+              this.$notify({
+                title: '成功',
+                message: '注册',
+                type: 'success'
+              });
+              this.$router.push('/login')
+            }else {
+              this.$notify.error({
+                title: '错误',
+                message: '登录失败'
+              });
+              return false;
+            }
+          }).catch((err)=>{
+            console.log(err)
+          })
         } else {
           console.log('error submit!!');
+          this.$notify.error({
+            title: '错误',
+            message: '登录失败'
+          });
           return false;
         }
       });

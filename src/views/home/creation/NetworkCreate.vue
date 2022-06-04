@@ -2,7 +2,6 @@
   <div class="network-box">
 
     <div class="network-data-box">
-      <el-divider></el-divider>
       <node-editor :current-node="currentNode" :id-list="idList" :net-id="netId"
                    @nodeUpdated="nodeDataUpdate" @updateNodeXY="updateNodeList"></node-editor>
       <el-divider></el-divider>
@@ -353,6 +352,13 @@ export default {
   margin-left: -40px;
   text-align: center;
   position: absolute;
+}
+
+.el-divider--horizontal {
+  display: block;
+  height: 1px;
+  width: 100%;
+  /* margin: 24px 0; */
 }
 
 </style>
