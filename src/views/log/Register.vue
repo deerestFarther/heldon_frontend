@@ -101,20 +101,20 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          axios.post("http://www.pandub.cn:8080/authorization/add/authorization/new/"+0+"&&"+this.ruleForm.account
+          axios.post("http://172.27.82.222:8080/authorization/add/authorization/new/"+"0"+"&&"+this.ruleForm.account
           +"&&"+this.ruleForm.pass).then(({data})=> {
             console.log(data)
             if(data){
               this.$notify({
                 title: '成功',
-                message: '注册',
+                message: '注册成功',
                 type: 'success'
               });
               this.$router.push('/login')
             }else {
               this.$notify.error({
                 title: '错误',
-                message: '登录失败'
+                message: '注册失败'
               });
               return false;
             }
