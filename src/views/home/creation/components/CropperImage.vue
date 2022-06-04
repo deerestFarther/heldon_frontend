@@ -53,8 +53,6 @@
         <el-button size="mini" type="danger" plain @click="rotateLeft">↺ 左旋转</el-button>
         <el-button size="mini" type="danger" plain @click="rotateRight">↻ 右旋转</el-button>
         <el-button size="mini" type="warning" plain @click="RD.changeMode=!RD.changeMode">取消</el-button>
-      </div>
-      <div class="upload-btn">
         <el-button size="mini" type="success" @click="RD.changeMode=!uploadImg('blob')">确定<i class="el-icon-upload"></i>
         </el-button>
       </div>
@@ -106,11 +104,7 @@ export default {
       }
     }
   },
-  watch: {
-    'imgUrl': function (val) {//props未更新
-      this.option.img = val
-    }
-  },
+
   methods: {
     //初始化函数
     imgLoad (msg) {
@@ -134,7 +128,7 @@ export default {
       this.previews = data
     },
     //选择图片
-    selectImg (e) {
+    async selectImg (e) {
       let file = e.target.files[0]
       if (!/\.(jpg|jpeg|png|JPG|PNG)$/.test(e.target.value)) {
         this.$message({
@@ -176,18 +170,8 @@ export default {
             }
             let fileName = getFileNameUUID() + '.png'
             try {
-              await client.put(fileName, data)
-            } catch (e) {
-              this.$message({
-                message: '图片服务器异常,请联系管理员',
-                type: 'error'
-              })
-
-              return
-            }
-            try {
-              let result = await client.signatureUrl(fileName)
-              this.$emit('imgUploaded', result)
+              let result = await client.put(fileName, data)
+              this.$emit('imgUploaded', result.url)
             } catch (e) {
               this.$message({
                 message: '图片服务器异常,请联系管理员',
@@ -249,6 +233,7 @@ export default {
   .scope-btn {
     display: flex;
     display: -webkit-flex;
+    flex-flow: row wrap;
     justify-content: space-between;
     padding-right: 10px;
   }

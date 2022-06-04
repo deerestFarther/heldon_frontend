@@ -1,48 +1,48 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import HomeView from '../views/HomeView.vue'
-import NetworkView from '@/views/NetworkView'
-import Login from "@/views/log/Login.vue";
-import Register from "@/views/log/Register";
-import Home from "@/views/Home";
-import Welcome from "@/views/home/welcome/Welcome";
-import Creation from "@/views/home/creation/Creation";
-import Collection from "@/views/home/collection/Collection";
-import My from "@/views/home/my/My"
-
+import NetworkView from '@/views/home/creation/NetworkView'
+import Login from '@/views/log/Login.vue'
+import Register from '@/views/log/Register'
+import Home from '@/views/Home'
+import Welcome from '@/views/home/welcome/Welcome'
+import Creation from '@/views/home/creation/Creation'
+import Collection from '@/views/home/collection/Collection'
+import My from '@/views/home/my/My'
+import NetworkCreate from '@/views/home/creation/NetworkCreate'
 
 Vue.use(VueRouter)
 
 const routes = [
   {
     path: '/',
-    redirect:'/home'
+    redirect: '/home'
   },
   {
     path: '/login',
-    name:'login',
+    name: 'login',
     component: Login
   },
   {
     path: '/register',
-    name:'register',
+    name: 'register',
     component: Register
   },
   {
     path: '/home',
     component: Home,
-    redirect:'/welcome',
-    children:[{
+    redirect: '/welcome',
+    children: [{
       path: '/welcome',
       component: Welcome
-    },{
+    }, {
       path: '/creation',
       component: Creation
-    },{
-      path:'/collection',
+    }, {
+      path: '/collection',
       component: Collection
-    },{
-      path:'/my',
+    }, {
+      path: '/my',
       component: My
     }]
   },
@@ -62,8 +62,13 @@ const routes = [
     }
   },
   {
-    path: '/network',
-    name: 'network',
+    path: '/networkCreate',
+    name: 'networkCreate',
+    component: NetworkCreate
+  },
+  {
+    path: '/networkView',
+    name: 'networkView',
     component: NetworkView
   }
 ]

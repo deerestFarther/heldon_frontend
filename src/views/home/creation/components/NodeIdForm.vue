@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-button type="text" @click="dialogVisible = true;">增加结点</el-button>
-    <el-dialog title="节点名称" :visible.sync="dialogVisible" width="30%">
+    <el-dialog title="节点名称" :visible.sync="dialogVisible" width="30%" :close-on-click-modal=false>
       <div slot="footer" class="dialog-footer">
         <el-form :model="nodeIdForm" status-icon :rules="rules" ref="nodeIdForm" label-width="100px"
                  class="demo-ruleForm">
@@ -10,7 +10,7 @@
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="confirmNodeId">提交</el-button>
-            <el-button @click="dialogVisible=false">取消</el-button>
+            <el-button @click="nodeIdForm.nodeId='';dialogVisible=false">取消</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -48,14 +48,12 @@ export default {
   props: {
     nameList: {},
   },
-
   watch: {
     'nameList': function (val) {//props未更新
       this.nameList = val
     },
   },
   methods: {
-
     confirmNodeId () {
       this.$refs.nodeIdForm.validate((val, obj) => {
         if (val) {
