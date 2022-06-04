@@ -64,20 +64,24 @@
 
     <el-dialog title="添加新结点" :visible.sync="newNodeDialogVisible" width="30%" :close-on-click-modal=false>
       <el-form :model="newNodeForm" :rules="rules" ref="newNodeForm">
-        <img class="img-box" :src="newNodeForm.url"/>
-        <cropper-image @imgUploaded="updateNodePic($event,newNodeForm)"></cropper-image>
-
+        <img class="img-box" :src="newNodeForm.url" v-show="msgFormSon" style="margin-bottom: 10px;float: inherit;"/>
+        <cropper-image @imgUploaded="updateNodePic($event,newNodeForm)" @func="getMsgFormSon" style="margin-bottom: 10px;"></cropper-image>
+        <div style="height: 80px">
+          <div class="node-edit-color" style="margin: 22px;">
+            字体颜色 <el-color-picker v-model="newNodeForm.fontColor" show-alpha :predefine="predefineColors"/>
+          </div>
+          <div class="node-edit-color" style="margin: 22px;">
+            背景颜色 <el-color-picker v-model="newNodeForm.color" show-alpha :predefine="predefineColors"/>
+          </div>
+          <div class="node-edit-color" style="margin: 22px;">
+            边框颜色 <el-color-picker v-model="newNodeForm.borderColor" show-alpha :predefine="predefineColors"/>
+          </div>
+        </div>
         <el-form-item prop="id">
-          <el-input v-model="newNodeForm.id" :maxlength=15 show-word-limit></el-input>
+          <el-input v-model="newNodeForm.id" :maxlength=15 show-word-limit placeholder="请输入结点名称"></el-input>
         </el-form-item>
-        字体颜色
-        <el-color-picker v-model="newNodeForm.fontColor" show-alpha :predefine="predefineColors"/>
-        背景颜色
-        <el-color-picker v-model="newNodeForm.color" show-alpha :predefine="predefineColors"/>
-        边框颜色
-        <el-color-picker v-model="newNodeForm.borderColor" show-alpha :predefine="predefineColors"/>
         <el-form-item prop="content">
-          <el-input type="textarea" :rows="2" placeholder="请输入内容" v-model="newNodeForm.content"></el-input>
+          <el-input type="textarea" :rows="2" placeholder="请输入结点信息" v-model="newNodeForm.content"></el-input>
         </el-form-item>
         <el-button type="primary" @click="addNewNode">提交</el-button>
         <el-button @click="newNodeDialogVisible=false">取消</el-button>

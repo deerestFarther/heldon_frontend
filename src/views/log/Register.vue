@@ -101,7 +101,7 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          axios.post("http://172.27.82.222:8080/authorization/add/authorization/new/"+"0"+"&&"+this.ruleForm.account
+          axios.post("http://www.pandub.cn:8080/authorization/add/authorization/new/"+"0"+"&&"+this.ruleForm.account
           +"&&"+this.ruleForm.pass).then(({data})=> {
             console.log(data)
             if(data){
