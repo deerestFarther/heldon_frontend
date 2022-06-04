@@ -33,7 +33,7 @@ export default {
   components: { NodeView, LineView, RelationGraph },
   data () {
     return {
-      netId: 2,
+      netId: null,
       graphOptions: {
         // allowSwitchLineShape: true,
         // allowSwitchJunctionPoint: true,
@@ -52,8 +52,8 @@ export default {
       currentLineFromList: [],//to为currentNode
     }
   },
-
   mounted () {
+    this.netId = this.$route.query.netId
     console.log(this.GetNetFromBackEnd(this.netId))
     // this.showRN()
   },

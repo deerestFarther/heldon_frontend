@@ -70,8 +70,8 @@ export default {
   },
 
   mounted () {
-    this.netId = this.$route.params.netId
-    console.log(this.netId)
+    this.netId = this.$route.query.netId
+
     this.GetNetFromBackEnd(this.netId)
     // this.showRN()
   },

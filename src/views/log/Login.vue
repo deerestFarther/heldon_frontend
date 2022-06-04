@@ -36,24 +36,24 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
-  name: "Login",
-  data() {
+  name: 'Login',
+  data () {
     var checkAccount = (rule, value, callback) => {
       if (!value) {
-        return callback(new Error('账号不能为空'));
-      }
-    };
+        return callback(new Error('账号不能为空'))
+      } else
+        return callback()
+    }
     var validatePass = (rule, value, callback) => {
       if (value === '') {
-        callback(new Error('请输入密码'));
+        return callback(new Error('请输入密码'))
       } else {
-        if (this.ruleForm.pass !== '') {
-          this.$refs.ruleForm.validateField('checkPass');
-        }
-        callback();
+        return callback()
       }
-    };
+    }
     return {
       save: 'false',
       ruleForm: {
@@ -62,40 +62,57 @@ export default {
       },
       rules: {
         pass: [
-          {validator: validatePass, trigger: 'blur'}
+          { validator: validatePass, trigger: 'blur' }
         ],
         account: [
-          {validator: checkAccount, trigger: 'blur'}
+          { validator: checkAccount, trigger: 'blur' }
         ],
       },
-    };
+    }
   },
   methods: {
-    submitForm(formName) {
+    submitForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          alert('submit!');
+          // alert('submit!')
           this.$notify({
             title: '成功',
             message: '登录',
             type: 'success'
-          });
+          })
+          axios.post('http://localhost:8080/authorization/validate/authorization/' + this.ruleForm.account +
+              '&&' + this.ruleForm.pass
+          ).then(({ data }) => {
+            if (data) {
+              sessionStorage.setItem('userId', data)
+              console.log(data)
+              this.$router.push('/home')
+            } else {
+              this.$notify.error({
+                title: '错误',
+                message: '登录失败'
+              })
+              console.log('error submit!!')
+              return false
+            }
+          }).catch((err) => {
+            console.log(err)
+          })
           // window.sessionStorage.setItem("token",token值)
-          this.$router.push('/home')
         } else {
           this.$notify.error({
             title: '错误',
             message: '登录失败'
-          });
-          console.log('error submit!!');
-          return false;
+          })
+          console.log('error submit!!')
+          return false
         }
-      });
+      })
     },
     handleSave: function () {
-      this.save = "ture";
-      localStorage.setItem('save', this.save);
-      console.log(localStorage.save);
+      this.save = 'ture'
+      localStorage.setItem('save', this.save)
+      console.log(localStorage.save)
     },
   },
 }
@@ -110,7 +127,7 @@ export default {
   position: relative;
 }
 
-#headline{
+#headline {
   font-size: 50px;
   font-weight: 900;
   margin-top: 7%;
