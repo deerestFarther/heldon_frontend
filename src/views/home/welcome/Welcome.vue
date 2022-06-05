@@ -1,17 +1,60 @@
 <template>
   <div id="content">
-    首页+搜索（陈子涵）
+    <el-container class="el-container-search" id="search">
+      <SearchBar/>
+    </el-container>
+    <el-container class="el-container-rns" id="rns-wrapper">
+      <CategorizedRns/>
+    </el-container>
+    <el-container class="el-container-rns" id="rns-wrapper">
+      <CategorizedRns/>
+    </el-container>
   </div>
 </template>
 
 <script>
+import axios from 'axios'
+//引入组件
+import SearchBar from "@/components/SearchBar";
+import CategorizedRns from "@/components/CategorizedRns";
+
 export default {
-  name: "Welcome"
+  name: "Welcome",
+  //注册组件
+  components:{SearchBar,CategorizedRns},
+
 }
+
+
 </script>
 
 <style scoped>
-#content{
+#content {
+  /* 弹性布局 水平、垂直居中 */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   background: #f8f8f8;
 }
+.el-container-search{
+  background: #ffffff;
+  margin: 1% 1% 0 1%;
+  width: 80%;
+  height: 90px;
+  box-shadow: 5px 5px 5px #cccccc;
+}
+.el-container-rns{
+  /* 弹性布局 水平、垂直居中 */
+  display: flex;
+  flex-direction: column;
+  justify-content: left;
+  align-items: flex-start;
+  background: #ffffff;
+  margin: 1% 1% 0 1%;
+  width: 80%;
+  height: auto;
+  box-shadow: 5px 5px 5px #cccccc;
+}
+
 </style>
