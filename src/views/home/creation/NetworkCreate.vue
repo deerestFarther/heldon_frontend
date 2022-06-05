@@ -113,69 +113,68 @@ export default {
     onLineClick (lineObject, $event) {
       console.log('onLineClick:', lineObject)
     },
-    inputNodeText (e) {
-      this.currentNode.text = e.target.value
-    },
-
-    addNode (newNodeId) {//添加node时，其保证的不是整体id唯一，而是添加所有node的id唯一
-      let newNode = {
-        id: newNodeId,
-        text: newNodeId,
-        color: '#ffffff',
-        borderColor: '#ffffff',
-        fontColor: '#000000',
-        borderWidth: 3,
-        data: { url: '', id: '', content: '' },
-        x: 0,
-        y: 0,
-      }
-      let __graph_json_data = {
-        nodes: [
-          newNode
-        ],
-        links: []
-      }
-      axios.post('http://localhost:8080/node/insertOneNode', {
-        netId: this.netId,
-        nodeName: newNode.id,
-        id: newNode.id,
-        text: newNode.text,
-        color: newNode.color,
-        borderColor: newNode.borderColor,
-        fontColor: newNode.fontColor,
-        content: newNode.data.content,
-        x: newNode.x,
-        y: newNode.y,
-        url: newNode.data.url
-      }).then((res) => {
-        this.$refs.RN.appendJsonData(__graph_json_data, (seeksRGGraph) => {
-          // 这些写上当图谱初始化完成后需要执行的代码
-          this.onNodeClick(this.$refs.RN.getNodeById(newNodeId))
-          this.focusNodeById(newNodeId)
-          this.updateMsg4Cp()
-        })
-      }).catch((err) => {
-        console.log(err)
-      })
-    },
-    saveLastNodeList () {
-      let currentNodeList = this.$refs.RN.getNodes()
-      currentNodeList.forEach((node) => {
-        this.lastNodeList.push({
-          borderColor: node.borderColor,
-          color: node.color,
-          data: {
-            url: node.data.url,
-            content: node.data.content,
-          },
-          fontColor: node.fontColor,
-          id: node.id,
-          text: node.text,
-          x: node.x,
-          y: node.y,
-        })
-      })
-    },
+    // inputNodeText (e) {
+    //   this.currentNode.text = e.target.value
+    // },
+    // addNode (newNodeId) {//添加node时，其保证的不是整体id唯一，而是添加所有node的id唯一
+    //   let newNode = {
+    //     id: newNodeId,
+    //     text: newNodeId,
+    //     color: '#ffffff',
+    //     borderColor: '#ffffff',
+    //     fontColor: '#000000',
+    //     borderWidth: 3,
+    //     data: { url: '', id: '', content: '' },
+    //     x: 0,
+    //     y: 0,
+    //   }
+    //   let __graph_json_data = {
+    //     nodes: [
+    //       newNode
+    //     ],
+    //     links: []
+    //   }
+    //   axios.post('http://localhost:8080/node/insertOneNode', {
+    //     netId: this.netId,
+    //     nodeName: newNode.id,
+    //     id: newNode.id,
+    //     text: newNode.text,
+    //     color: newNode.color,
+    //     borderColor: newNode.borderColor,
+    //     fontColor: newNode.fontColor,
+    //     content: newNode.data.content,
+    //     x: newNode.x,
+    //     y: newNode.y,
+    //     url: newNode.data.url
+    //   }).then((res) => {
+    //     this.$refs.RN.appendJsonData(__graph_json_data, (seeksRGGraph) => {
+    //       // 这些写上当图谱初始化完成后需要执行的代码
+    //       this.onNodeClick(this.$refs.RN.getNodeById(newNodeId))
+    //       this.focusNodeById(newNodeId)
+    //       this.updateMsg4Cp()
+    //     })
+    //   }).catch((err) => {
+    //     console.log(err)
+    //   })
+    // },
+    // saveLastNodeList () {
+    //   let currentNodeList = this.$refs.RN.getNodes()
+    //   currentNodeList.forEach((node) => {
+    //     this.lastNodeList.push({
+    //       borderColor: node.borderColor,
+    //       color: node.color,
+    //       data: {
+    //         url: node.data.url,
+    //         content: node.data.content,
+    //       },
+    //       fontColor: node.fontColor,
+    //       id: node.id,
+    //       text: node.text,
+    //       x: node.x,
+    //       y: node.y,
+    //     })
+    //   })
+    // },
     updateNodeList () {
       let list = []
       this.$refs.RN.getNodes().forEach((node) => {
@@ -326,7 +325,7 @@ export default {
 .network-data-box {
   display: flex;
   flex-flow: column nowrap;
-  height: 100%;
+  height: calc(100vh);
   overflow-y: scroll;
   width: 500px;
 }

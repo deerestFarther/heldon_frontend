@@ -67,14 +67,15 @@ export default {
       this.currentLineToList = []
       this.currentLineFromList = []
       this.$refs.RN.getLines().forEach((line) => {//获得与当前结点有关的关系
-        if (line.fromNode.id === nodeObject.id) {//id是string
-          this.currentLineToList.push.apply(this.currentLineToList, line.relations)
-        }
-        if (line.toNode.id === nodeObject.id) {
-          this.currentLineFromList.push.apply(this.currentLineFromList, line.relations)
-        }
+        line.relations.forEach((relation) => {
+          if (relation.data.from === nodeObject.id) {//id是string
+            this.currentLineToList.push(relation)
+          }
+          if (relation.data.to === nodeObject.id) {
+            this.currentLineFromList.push(relation)
+          }
+        })
       })
-      console.log(this.currentLineToList)
     },
     //通过netId获取后端的关于整个图的数据用于展示
     async GetNetFromBackEnd (netId) {
@@ -166,7 +167,7 @@ export default {
 .network-data-box {
   display: flex;
   flex-flow: column nowrap;
-  height: 100%;
+  height: calc(100vh);
   overflow-y: scroll;
   width: 500px;
 }

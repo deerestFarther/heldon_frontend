@@ -75,11 +75,6 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           // alert('submit!')
-          this.$notify({
-            title: '成功',
-            message: '登录',
-            type: 'success'
-          })
           axios.post('http://localhost:8080/authorization/validate/authorization/' + this.ruleForm.account +
               '&&' + this.ruleForm.pass
           ).then(({ data }) => {
@@ -87,25 +82,27 @@ export default {
               sessionStorage.setItem('userId', data)
               console.log(data)
               this.$router.push('/home')
+              this.$notify({
+                title: '成功',
+                message: '登录',
+                type: 'success'
+              })
             } else {
               this.$notify.error({
                 title: '错误',
                 message: '登录失败'
               })
               console.log('error submit!!')
-              return false
             }
           }).catch((err) => {
             console.log(err)
           })
-          // window.sessionStorage.setItem("token",token值)
         } else {
           this.$notify.error({
             title: '错误',
             message: '登录失败'
           })
           console.log('error submit!!')
-          return false
         }
       })
     },
