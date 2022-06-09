@@ -80,7 +80,7 @@ export default {
             message: '登录',
             type: 'success'
           })
-          axios.post('http://www.pandub.cn:8080/authorization/validate/authorization/' + this.ruleForm.account +
+          axios.post('http://localhost:8080/authorization/validate/authorization/' + this.ruleForm.account +
               '&&' + this.ruleForm.pass
           ).then(({ data }) => {
             if (data) {
@@ -98,14 +98,12 @@ export default {
           }).catch((err) => {
             console.log(err)
           })
-          // window.sessionStorage.setItem("token",token值)
         } else {
           this.$notify.error({
             title: '错误',
             message: '登录失败'
           })
           console.log('error submit!!')
-          return false
         }
       })
     },

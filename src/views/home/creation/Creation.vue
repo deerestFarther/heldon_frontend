@@ -16,8 +16,14 @@
               <el-form-item label="关系网名称" prop="nodeId">
                 <el-input v-model="networkForm.netName" maxlength="15" show-word-limit></el-input>
               </el-form-item>
+              <el-form-item label="关系网标签" prop="tagId">
+                <el-select v-model="networkForm.tagId" placeholder="请选择">
+                  <el-option v-for="item in tagOptions" :key="item.value" :label="item.label" :value="item.value">
+                  </el-option>
+                </el-select>
+              </el-form-item>
               <el-form-item>
-                <el-button type="primary" @click="addNewNetwork(networkForm.netName)">提交</el-button>
+                <el-button type="primary" @click="addNewNetwork(networkForm.netName,networkForm.tagId)">提交</el-button>
                 <el-button @click="dialogVisible=false">取消</el-button>
               </el-form-item>
             </el-form>
@@ -39,32 +45,53 @@ export default {
   data () {
     return {
       dialogVisible: false,
-      networkList: [
-        {
-          netId: 2,
-          url: 'http://relation-network.oss-cn-chengdu.aliyuncs.com/1654320896995_1dcff1a4.png',
-          netName: '123'
-        },
-        {
-          netId: 3,
-          url: 'http://relation-network.oss-cn-chengdu.aliyuncs.com/1654320896995_1dcff1a4.png',
-          netName: '123'
-        },
-        {
-          netId: 4,
-          url: 'http://relation-network.oss-cn-chengdu.aliyuncs.com/1654320896995_1dcff1a4.png',
-          netName: '123'
-        }
-      ],
-      networkForm: { netName: '' },
-      rules: {}
+      networkList: [],
+      networkForm: { netName: '', tagId: null },
+      rules: {},
+      tagOptions: [],
     }
   },
+  mounted () {
+    this.getTags()
+    this.getNetworkListByUserId()
+  },
   methods: {
-    addNewNetwork (netName) {
-      axios.post('http://localhost:8080/network/insertNetwork/' + netName + '/' + sessionStorage.getItem('userId'))
+    addNewNetwork (netName, tagId) {
+      axios.post('http://localhost:8080/network/insertNetwork/' + netName
+          + '/' + sessionStorage.getItem('userId')
+          + '/' + tagId)
           .then(({ data }) => {
             console.log(data)
+          })
+          .catch((err) => {
+            console.log(err)
+          })
+    },
+    getNetworkListByUserId () {
+      axios.get('http://localhost:8080/network/getNetworkByUserId/' + sessionStorage.getItem('userId'))
+          .then(({ data }) => {
+            data.forEach((net) => {
+              this.networkList.push({
+                netId: net.netId,
+                netName: net.netName,
+                url: net.ext3,//ext3存放关系网的缩略图
+              })
+            })
+          })
+          .catch((err) => {
+            console.log(err)
+          })
+    },
+    getTags () {
+      axios.get('http://localhost:8080/tag/getTags')
+          .then(({ data }) => {
+            console.log(data)
+            data.forEach((tag) => {
+              this.tagOptions.push({
+                value: tag.tagId,
+                label: tag.tagName,
+              })
+            })
           })
           .catch((err) => {
             console.log(err)
