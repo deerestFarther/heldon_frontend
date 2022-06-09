@@ -28,7 +28,7 @@
       <el-divider direction="vertical"></el-divider>
       <div class="right">
         <div style="color: #9c9c9c;margin-top: 20%">还没有账号</div>
-        <el-button type="text" @click="$router.push('/register')">立即注册</el-button>
+        <el-button type="text" @click="$router.push('./register')">立即注册</el-button>
         <i class="el-icon-right"></i>
       </div>
     </div>
@@ -75,34 +75,37 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           // alert('submit!')
-          axios.post('http://localhost:8080/authorization/validate/authorization/' + this.ruleForm.account +
+          this.$notify({
+            title: '成功',
+            message: '登录',
+            type: 'success'
+          })
+          axios.post('http://www.pandub.cn:8080/authorization/validate/authorization/' + this.ruleForm.account +
               '&&' + this.ruleForm.pass
           ).then(({ data }) => {
             if (data) {
               sessionStorage.setItem('userId', data)
               console.log(data)
               this.$router.push('/home')
-              this.$notify({
-                title: '成功',
-                message: '登录',
-                type: 'success'
-              })
             } else {
               this.$notify.error({
                 title: '错误',
                 message: '登录失败'
               })
               console.log('error submit!!')
+              return false
             }
           }).catch((err) => {
             console.log(err)
           })
+          // window.sessionStorage.setItem("token",token值)
         } else {
           this.$notify.error({
             title: '错误',
             message: '登录失败'
           })
           console.log('error submit!!')
+          return false
         }
       })
     },

@@ -2,7 +2,7 @@
   <div id="searchbar">
     <el-input type="text" placeholder="输入搜索内容" v-model="keyWord" id="sb-input"></el-input>
 
-    <el-button id="sb-button" @click="">搜索</el-button>
+    <el-button id="sb-button" @click="searchRns">搜索</el-button>
 <!--    <ul >-->
 <!--      <li v-for="(p,index) of filRns" :key="index">-->
 <!--        {{ p.net_id }}-{{ p.net_name }}-->
@@ -17,12 +17,7 @@ export default {
   data() {
     return {
       keyWord:'',
-      rns:[//模拟后端传的数据
-        {net_id:10,net_name:"NBA全明星"},
-        {net_id:11,net_name:"CBA全明星"},
-        {net_id:12,net_name:"NFA全明星"},
-        {net_id:13,net_name:"WWE全明"},
-      ],
+      rns:[],
       //filRns:[] //如果使用watch实现的话就需要这个来暂存每一次过滤的结果
     };
   },
@@ -49,7 +44,16 @@ export default {
 
   methods:{
     sendRnRequest(){
-      axios.get('http://127.0.0.1:8080/')
+      axios.get('http://www.pandub.cn:8080/')
+    },
+    searchRns(){
+      axios.get('http://www.pandub.cn:8080/user/getInfoByNickname/'+this.keyWord)
+          .then((data) => {
+            console.log(data)
+          })
+          .catch((err) => {
+            console.log(err)
+          })
     }
   }
 };

@@ -14,7 +14,8 @@ export default {
       netName:"全职高手",
       createTime:"2022-06-01 23:39:18"
     }
-  }
+  },
+  props:['netName','createTime']//todo 拿到父组件v-for中的数据，还未测试
 }
 </script>
 
