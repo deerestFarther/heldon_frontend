@@ -43,12 +43,20 @@ export default {
       console.log(value)
       if (!value) {
         return callback(new Error('用户名不能为空'));
-      }else{
-        if(value.length<2||value.length>6){
-          return callback(new Error('用户名长度为2~6位'))
-        }else {
-          return callback()
-        }
+      }else if(value.length < 2 || value.length > 6)
+      {
+        return callback(new Error('用户名长度为2~6位'))
+      } else {
+        axios.get("http://www.pandub.cn:8080/authorization/exists/authorization/"+this.ruleForm.account).then(({data})=>{
+          console.log(data)
+          if (!data) {
+            return callback()
+          } else {
+            return callback(new Error('该用户名已存在'))
+          }
+        }).catch((err) => {
+          console.log(err)
+        })
       }
     };
     var validatePass = (rule, value, callback) => {

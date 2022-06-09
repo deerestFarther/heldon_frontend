@@ -11,7 +11,7 @@
       </el-menu>
       <div style="display: inline-block;">
         <div class="img_content"/>
-        <div class="username">用户名</div>
+        <div class="username">{{ UserName }}</div>
         <div class="return" @click="back">退出</div>
       </div>
     </el-header>
@@ -23,20 +23,38 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "Home",
   data() {
     return {
-      activeIndex: '/welcome'
+      activeIndex: '/welcome',
+      UserId:'',
+      UserName:''
     };
+  },
+  created() {
+    this.username()
   },
   methods: {
     handleSelect(key, keyPath) {
       console.log(key, keyPath);
     },
     back(){
-      window.sessionStorage.clear();
+      sessionStorage.clear();
       this.$router.push('/login')
+    },
+    username(){
+      this.UserId=sessionStorage.getItem('userId');
+      axios.get("http://www.pandub.cn:8080/user/getInfoByUserId/"+this.UserId).then(({data})=>{
+        if (data) {
+          this.UserName=data.nickname
+          console.log('user',data.nickname)
+        }
+      }).catch((err) => {
+        console.log(err)
+      })
     }
   }
 }

@@ -80,6 +80,7 @@ const router = new VueRouter({
 // 挂载路由导航守卫
 router.beforeEach((to, from, next) => {
   if (to.path === '/login') return next()
+  if(to.path==='/register') return next()
   const userId = sessionStorage.getItem('userId')
   if (!userId) return next('/login')
   next()
