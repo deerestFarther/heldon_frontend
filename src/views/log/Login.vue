@@ -55,7 +55,7 @@ export default {
       }
     }
     return {
-      save: 'false',
+      save: false,
       ruleForm: {
         pass: '',
         account: '',
@@ -80,7 +80,7 @@ export default {
             message: '登录',
             type: 'success'
           })
-          axios.post('http://localhost:8080/authorization/validate/authorization/' + this.ruleForm.account +
+          axios.post('http://www.pandub.cn:8080/authorization/validate/authorization/' + this.ruleForm.account +
               '&&' + this.ruleForm.pass
           ).then(({ data }) => {
             if (data) {
@@ -108,7 +108,7 @@ export default {
       })
     },
     handleSave: function () {
-      this.save = 'ture'
+      this.save = true
       localStorage.setItem('save', this.save)
       console.log(localStorage.save)
     },
