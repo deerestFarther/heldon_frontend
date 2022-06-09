@@ -164,7 +164,7 @@ export default {
       this.curLine.edgeId = line.data.id
       this.curLine.edgeName = line.text
       console.log(this.curLine)
-      await axios.put('http://localhost:8080/relation/updateRelation', this.curLine)
+      await axios.put('http://www.pandub.cn:8080/relation/updateRelation', this.curLine)
           .then(({ data }) => {
             // console.log(data)
             //成功
@@ -185,7 +185,7 @@ export default {
       this.dialogVisible = false
     },
     deleteLine (lineId) {
-      axios.delete('http://localhost:8080/relation/deleteRelationByEdgeId/' + lineId)
+      axios.delete('http://www.pandub.cn:8080/relation/deleteRelationByEdgeId/' + lineId)
           .then(({ data }) => {
             console.log(data)
             if (data) {
@@ -206,7 +206,7 @@ export default {
         if (valid) {
           this.newLineForm.from = this.currentNode.data.id
           this.newLineForm.edgeName = this.newLineForm.text
-          axios.post('http://localhost:8080/relation/insertRelation', this.newLineForm)
+          axios.post('http://www.pandub.cn:8080/relation/insertRelation', this.newLineForm)
               .then(({ data }) => {
                 if (data) {
                   this.$emit('lineUpdated')

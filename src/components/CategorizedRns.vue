@@ -8,10 +8,8 @@
       </div>
     </div>
     <div id="rn-wrapper">
-      <RnThumbnail/>
-      <RnThumbnail/>
-      <RnThumbnail/>
-      <RnThumbnail/>
+      <!--todo  以组件的形式进行遍历 未测试 还差数据    -->
+      <RnThumbnail v-for="rn in rns":key="rn.netId" net-name="rn.netName" create-time="rn.createTime"></RnThumbnail>
     </div>
   </div>
 </template>
@@ -23,8 +21,8 @@ export default {
   components:{RnThumbnail},
   data(){
     return {//保证每一次都是返回全新的
-      categories:"篮球"
-
+      categories:"篮球",
+      rns:[]
     };
   },
 }

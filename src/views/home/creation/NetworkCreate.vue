@@ -135,7 +135,7 @@ export default {
         ],
         links: []
       }
-      axios.post('http://localhost:8080/node/insertOneNode', {
+      axios.post('http://www.pandub.cn:8080/node/insertOneNode', {
         netId: this.netId,
         nodeName: newNode.id,
         id: newNode.id,
@@ -185,7 +185,7 @@ export default {
           y: node.y,
         })
       })
-      axios.put('http://localhost:8080/node/updateNodeList', list)
+      axios.put('http://www.pandub.cn:8080/node/updateNodeList', list)
           .then((res) => {
             //更新成功
           }).catch((err) => {
@@ -193,7 +193,7 @@ export default {
       })
     },
     async DeleteNode () {
-      await axios.get('http://localhost:8080/node/deleteNodeByNodeId/' + this.currentNode.data.id,
+      await axios.get('http://www.pandub.cn:8080/node/deleteNodeByNodeId/' + this.currentNode.data.id,
       ).then((res) => {
         this.$refs.RN.removeNodeById(this.currentNode.id)
         let id
@@ -234,7 +234,7 @@ export default {
         nodes: [],
         links: [],
       }
-      await axios.get('http://localhost:8080/network/getRootIdNameByNetId/' + netId)
+      await axios.get('http://www.pandub.cn:8080/network/getRootIdNameByNetId/' + netId)
           .then(({ data }) => {
             __graph_json_data.rootId = data
             this.rootNodeId = data
@@ -243,7 +243,7 @@ export default {
           })
       //初始化nodes
       let mp = new Map() //nodeId 到 id 的映射
-      await axios.get('http://localhost:8080/node/getNodeListByNetId/' + netId)
+      await axios.get('http://www.pandub.cn:8080/node/getNodeListByNetId/' + netId)
           .then(({ data }) => {
             for (let i = 0; i < data.length; i++) {
               mp.set(data[i].nodeId, data[i].id)
@@ -268,7 +268,7 @@ export default {
           }).catch(function (err) {
             console.log(err)
           })
-      await axios.get('http://localhost:8080/relation/getRelationListByNetId/' + netId)
+      await axios.get('http://www.pandub.cn:8080/relation/getRelationListByNetId/' + netId)
           .then(({ data }) => {
             for (let i = 0; i < data.length; i++) {
               __graph_json_data.links.push({

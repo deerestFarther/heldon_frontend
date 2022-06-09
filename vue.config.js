@@ -1,9 +1,9 @@
 module.exports = {
   devServer: {
     port: 3000,
-    proxy: {
+    proxy: {//跨域处理
       '/api': {
-        target: 'http://127.0.0.1:8080/api',
+        target: 'http://www.pandub.cn:8080/api',
         changeOrigin: true,
         pathRewrite: {
           '^/api': ''

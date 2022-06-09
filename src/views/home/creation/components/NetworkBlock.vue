@@ -38,7 +38,7 @@ export default {
       })
     },
     deleteNetwork () {
-      axios.delete('http://localhost:8080/network/deleteNetworkByNetId/' + this.netId)
+      axios.delete('http://www.pandub.cn:8080/network/deleteNetworkByNetId/' + this.netId)
           .then(({ data }) => {
 
           })

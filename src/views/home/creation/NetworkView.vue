@@ -83,7 +83,7 @@ export default {
         nodes: [],
         links: [],
       }
-      await axios.get('http://localhost:8080/network/getRootIdNameByNetId/' + netId)
+      await axios.get('http://www.pandub.cn:8080/network/getRootIdNameByNetId/' + netId)
           .then(({ data }) => {
             __graph_json_data.rootId = data
           }).catch(function (err) {
@@ -91,7 +91,7 @@ export default {
           })
       //初始化nodes
       let mp = new Map() //nodeId 到 id 的映射
-      await axios.get('http://localhost:8080/node/getNodeListByNetId/' + netId)
+      await axios.get('http://www.pandub.cn:8080/node/getNodeListByNetId/' + netId)
           .then(({ data }) => {
             for (let i = 0; i < data.length; i++) {
               mp.set(data[i].nodeId, data[i].id)
@@ -116,7 +116,7 @@ export default {
           }).catch(function (err) {
             console.log(err)
           })
-      await axios.get('http://localhost:8080/relation/getRelationListByNetId/' + netId)
+      await axios.get('http://www.pandub.cn:8080/relation/getRelationListByNetId/' + netId)
           .then(({ data }) => {
             for (let i = 0; i < data.length; i++) {
               __graph_json_data.links.push({

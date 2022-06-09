@@ -62,7 +62,7 @@ export default {
   },
   methods: {
     addNewNetwork (netName) {
-      axios.post('http://localhost:8080/network/insertNetwork/' + netName + '/' + sessionStorage.getItem('userId'))
+      axios.post('http://www.pandub.cn:8080/network/insertNetwork/' + netName + '/' + sessionStorage.getItem('userId'))
           .then(({ data }) => {
             console.log(data)
           })

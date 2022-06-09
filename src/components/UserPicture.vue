@@ -1,7 +1,7 @@
 <template>
 <div>
   <div class="user_picture"></div>
-  <div class="user_name">用户名</div>
+  <div class="user_name">{{username}}</div>
   <div class="user_info">
     <div class="user_inf">
       <div class="user_info_title">点赞</div>
@@ -17,7 +17,13 @@
 
 <script>
 export default {
-  name: "UserPicture"
+  name: "UserPicture",
+  data(){
+    return{
+      username:'用户名'
+    }
+  }
+
 }
 </script>
 
