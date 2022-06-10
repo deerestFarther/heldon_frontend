@@ -80,7 +80,7 @@ export default {
             message: '登录',
             type: 'success'
           })
-          axios.post('http://www.pandub.cn:8080/authorization/validate/authorization/' + this.ruleForm.account +
+          axios.post('http://localhost:8080/authorization/validate/authorization/' + this.ruleForm.account +
               '&&' + this.ruleForm.pass
           ).then(({ data }) => {
             if (data) {

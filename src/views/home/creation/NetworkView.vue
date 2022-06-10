@@ -78,21 +78,22 @@ export default {
       })
     },
     //通过netId获取后端的关于整个图的数据用于展示
-    async GetNetFromBackEnd (netId) {
+    async GetNetFromBackEnd (netId, nodeId) {
       let __graph_json_data = {
         rootId: '',//todo 每个图需要一个root
         nodes: [],
         links: [],
       }
-      await axios.get('http://www.pandub.cn:8080/network/getRootIdNameByNetId/' + netId)
+      await axios.get('http://localhost:8080/network/getRootIdNameByNetId/' + netId)
           .then(({ data }) => {
             __graph_json_data.rootId = data
+            this.rootNodeId = data
           }).catch(function (err) {
             console.log(err)
           })
       //初始化nodes
       let mp = new Map() //nodeId 到 id 的映射
-      await axios.get('http://www.pandub.cn:8080/node/getNodeListByNetId/' + netId)
+      await axios.get('http://localhost:8080/node/getNodeListByNetId/' + netId)
           .then(({ data }) => {
             for (let i = 0; i < data.length; i++) {
               mp.set(data[i].nodeId, data[i].id)
@@ -117,20 +118,21 @@ export default {
           }).catch(function (err) {
             console.log(err)
           })
-      await axios.get('http://www.pandub.cn:8080/relation/getRelationListByNetId/' + netId)
+      await axios.get('http://localhost:8080/relation/getRelationListByNetId/' + netId)
           .then(({ data }) => {
             for (let i = 0; i < data.length; i++) {
               __graph_json_data.links.push({
                 from: mp.get(data[i].nodeIdFrom),
                 to: mp.get(data[i].nodeIdTo),
                 fontColor: data[i].fontColor,
-                lineShape: data[i].lineShape,
+                lineShape: parseInt(data[i].lineShape),
                 text: data[i].text,
                 lineWidth: data[i].lineWidth,
                 color: data[i].color,
                 data: {
                   content: data[i].content,
-                  from: mp.get(data[i].nodeIdFrom), to: mp.get(data[i].nodeIdTo)
+                  from: mp.get(data[i].nodeIdFrom), to: mp.get(data[i].nodeIdTo),
+                  id: data[i].edgeId,
                 }
               })
             }
@@ -138,7 +140,10 @@ export default {
                 __graph_json_data,
                 (RN) => {
                   //called when the relation-graph is completed
-                  this.onNodeClick(RN.getNodeById(__graph_json_data.rootId))
+                  if (nodeId == null)
+                    this.focusNodeById(this.rootNodeId)
+                  else
+                    this.focusNodeById(nodeId)
                 }
             )
           }).catch(function (err) {

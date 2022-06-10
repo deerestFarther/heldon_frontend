@@ -47,7 +47,7 @@ export default {
       {
         return callback(new Error('用户名长度为2~6位'))
       } else {
-        axios.get("http://www.pandub.cn:8080/authorization/exists/authorization/"+this.ruleForm.account).then(({data})=>{
+        axios.get("http://localhost:8080/authorization/exists/authorization/"+this.ruleForm.account).then(({data})=>{
           console.log(data)
           if (!data) {
             return callback()
@@ -109,7 +109,7 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          axios.post("http://www.pandub.cn:8080/authorization/add/authorization/new/"+"0"+"&&"+this.ruleForm.account
+          axios.post("http://localhost:8080/authorization/add/authorization/new/"+"0"+"&&"+this.ruleForm.account
           +"&&"+this.ruleForm.pass).then(({data})=> {
             console.log(data)
             if(data){
