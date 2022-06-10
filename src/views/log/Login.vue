@@ -75,11 +75,7 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           // alert('submit!')
-          this.$notify({
-            title: '成功',
-            message: '登录',
-            type: 'success'
-          })
+
           axios.post('http://localhost:8080/authorization/validate/authorization/' + this.ruleForm.account +
               '&&' + this.ruleForm.pass
           ).then(({ data }) => {

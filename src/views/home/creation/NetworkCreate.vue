@@ -47,7 +47,7 @@ export default {
         moveToCenterWhenResize: false,
         // 这里可以参考"Graph 图谱"中的参数进行设置
       },
-
+      netMessages: {},
       currentNode: {
         data: {
           url: ''
@@ -65,7 +65,7 @@ export default {
         changeNodeName: false,
         originalName: '',
       },
-      idList: [],
+      idList: [], //存放了当前结点以外的所有结点的id
     }
   },
 
@@ -186,10 +186,19 @@ export default {
       })
       axios.put('http://localhost:8080/node/updateNodeList', list)
           .then((res) => {
+            this.$message({
+              type: 'success',
+              message: '保存成功'
+            })
             //更新成功
-          }).catch((err) => {
-        console.log(err)
-      })
+          })
+          .catch((err) => {
+            this.$message({
+              type: 'error',
+              message: '保存失败'
+            })
+            console.log(err)
+          })
     },
     async DeleteNode () {
       await axios.get('http://localhost:8080/node/deleteNodeByNodeId/' + this.currentNode.data.id,
@@ -233,10 +242,11 @@ export default {
         nodes: [],
         links: [],
       }
-      await axios.get('http://localhost:8080/network/getRootIdNameByNetId/' + netId)
+      await axios.get('http://localhost:8080/network/getNetworkByNetId/' + netId)
           .then(({ data }) => {
-            __graph_json_data.rootId = data
-            this.rootNodeId = data
+            this.netMessages.netName = data.netName
+            this.netMessages.netId = data.netId
+            this.netMessages.rootNodeId = data.rootNodeId
           }).catch(function (err) {
             console.log(err)
           })
@@ -246,6 +256,10 @@ export default {
           .then(({ data }) => {
             for (let i = 0; i < data.length; i++) {
               mp.set(data[i].nodeId, data[i].id)
+              if (data[i].nodeId === this.netMessages.rootNodeId) {
+                __graph_json_data.rootId = data[i].id
+                this.rootNodeId = data[i].id
+              }
               __graph_json_data.nodes.push({
                 id: data[i].id,
                 text: data[i].text,

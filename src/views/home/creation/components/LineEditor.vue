@@ -10,23 +10,29 @@
               {{ line.data.to }}
             </div>
           </div>
-
-
           <div style="overflow: hidden">
             <div class="line-edit-color" style="margin: 22px 50px;">
               字体颜色
-              <el-color-picker :value="line.fontColor" show-alpha :predefine="predefineColors"/>
+              <el-color-picker v-model="curLine.fontColor" show-alpha :predefine="predefineColors"/>
             </div>
             <div class="line-edit-color" style="margin: 22px 50px;">
               线条颜色
-              <el-color-picker v-model="line.color" show-alpha :predefine="predefineColors"/>
+              <el-color-picker v-model="curLine.color" show-alpha :predefine="predefineColors"/>
             </div>
           </div>
-          <el-input style="margin-bottom: 22px" v-model="curLine.text" maxlength="15" show-word-limit></el-input>
+          <div>
+            线条样式
+            <el-select v-model="curLine.lineShape" placeholder="请选择">
+              <el-option
+                  v-for="item in lineShapeOptions" :key="item.value" :label="item.label" v-model="item.value">
+              </el-option>
+            </el-select>
+          </div>
           <div class="line-width-box" style="margin-bottom: 22px">
             线条粗细
             <el-slider v-model="curLine.lineWidth" :max=10 :min=1></el-slider>
           </div>
+          <el-input style="margin-bottom: 22px" v-model="curLine.text" maxlength="15" show-word-limit></el-input>
           <el-input type="textarea" :rows="2" placeholder="请输入内容" v-model="curLine.content"
                     style="margin-bottom: 22px"></el-input>
           <el-button type="primary" @click="confirmChangeLine(line)">提交</el-button>
@@ -54,12 +60,12 @@
         </div>
         <el-row>
           <el-col :span="12">
-            <el-tooltip class="item" effect="dark" content="删除结点" placement="bottom">
+            <el-tooltip class="item" effect="dark" content="删除关系" placement="bottom">
               <el-button type="danger" icon="el-icon-delete" circle @click="deleteLine(line.data.id)"></el-button>
             </el-tooltip>
           </el-col>
           <el-col :span="12">
-            <el-tooltip class="item" effect="dark" content="编辑结点" placement="bottom">
+            <el-tooltip class="item" effect="dark" content="编辑关系" placement="bottom">
               <el-button type="primary" icon="el-icon-edit" circle @click="changeLine(line)"></el-button>
             </el-tooltip>
           </el-col>
@@ -73,7 +79,7 @@
           <el-form-item prop="to">
             关系对象 :
             <el-select v-model="newLineForm.to" placeholder="请选择">
-              <el-option v-for="item in nodeOptions" :key="item.value" :label="item.label" :value="item.value"
+              <el-option v-for="item in nodeOptions" :key="item.value" :label="item.label" v-model="item.value"
                          :disabled="item.disabled">
               </el-option>
             </el-select>
@@ -82,7 +88,7 @@
         <div style="overflow: hidden">
           <div class="line-edit-color" style="margin: 22px 50px;">
             字体颜色
-            <el-color-picker :value="newLineForm.fontColor" show-alpha :predefine="predefineColors"/>
+            <el-color-picker v-model="newLineForm.fontColor" show-alpha :predefine="predefineColors"/>
           </div>
           <div class="line-edit-color" style="margin: 22px 50px;">
             线条颜色
@@ -93,7 +99,7 @@
           线条样式
           <el-select v-model="newLineForm.lineShape" placeholder="请选择">
             <el-option
-                v-for="item in lineShapeOptions" :key="item.value" :label="item.label" :value="item.value">
+                v-for="item in lineShapeOptions" :key="item.value" :label="item.label" v-model="item.value">
             </el-option>
           </el-select>
         </div>
@@ -206,21 +212,37 @@ export default {
       this.dialogVisible = false
     },
     deleteLine (lineId) {
-      axios.delete('http://localhost:8080/relation/deleteRelationByEdgeId/' + lineId)
-          .then(({ data }) => {
-            console.log(data)
-            if (data) {
-              this.$emit('lineUpdated')
-            } else {
-              this.$message({
-                message: '添加关系删除失败',
-                type: 'error'
-              })
-            }
-          })
-          .catch((err) => {
-            console.log(err)
-          })
+      this.$confirm('此操作将永久删除该关系，是否继续？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+            axios.delete('http://localhost:8080/relation/deleteRelationByEdgeId/' + lineId)
+                .then(({ data }) => {
+                  console.log(data)
+                  if (data) {
+                    this.$emit('lineUpdated')
+                    this.$message({
+                      type: 'success',
+                      message: '删除成功!'
+                    })
+                  } else {
+                    this.$message({
+                      message: '删除关系失败',
+                      type: 'error'
+                    })
+                  }
+                })
+                .catch((err) => {
+                  console.log(err)
+                })
+          }
+      ).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
     },
     addNewLine () {
       this.$refs.newLineForm.validate((valid) => {
@@ -233,6 +255,10 @@ export default {
                   this.$emit('lineUpdated')
                   this.$refs.newLineForm.resetFields()
                   this.newLineDialogVisible = false
+                  this.$message({
+                    message: '添加成功',
+                    type: 'success'
+                  })
                 } else {
                   this.$message({
                     message: '添加关系失败',
@@ -265,7 +291,7 @@ export default {
 
 .line-edit-color {
   float: left;
-  margin: 10px 50px;
+  margin: 10px 40px;
   display: flex;
   align-items: center;
 }

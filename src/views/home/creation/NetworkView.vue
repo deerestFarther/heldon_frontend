@@ -2,6 +2,12 @@
   <div class="network-box">
 
     <div class="network-data-box">
+      <div>
+        <h1>
+          {{ netMessages.netName }}
+          <collection-button :net-id="netId" ref="collectionButton"></collection-button>
+        </h1>
+      </div>
       <node-view :current-node="currentNode"></node-view>
       <line-view :current-line-from-list="currentLineFromList"
                  :current-line-to-list="currentLineToList"
@@ -27,10 +33,12 @@ import RelationGraph from 'relation-graph'
 import NodeView from '@/views/home/creation/components/NodeView'
 import LineView from '@/views/home/creation/components/LineView'
 import axios from 'axios'
+import collectionButton from '@/views/home/creation/components/collectionButton'
+import CollectionButton from '@/views/home/creation/components/collectionButton'
 
 export default {
   name: 'NetworkView',
-  components: { NodeView, LineView, RelationGraph },
+  components: { CollectionButton, NodeView, LineView, RelationGraph },
   data () {
     return {
       netId: null,
@@ -43,6 +51,7 @@ export default {
         moveToCenterWhenResize: false,
         // 这里可以参考"Graph 图谱"中的参数进行设置
       },
+      netMessages: {},
       currentNode: {
         data: {
           url: ''
@@ -50,11 +59,12 @@ export default {
       },
       currentLineToList: [], //from为currentNode
       currentLineFromList: [],//to为currentNode
+      ifCollected: false,
     }
   },
   mounted () {
     this.netId = this.$route.query.netId
-    console.log(this.GetNetFromBackEnd(this.netId))
+    this.GetNetFromBackEnd(this.netId)
     // this.showRN()
   },
 
@@ -84,10 +94,11 @@ export default {
         nodes: [],
         links: [],
       }
-      await axios.get('http://localhost:8080/network/getRootIdNameByNetId/' + netId)
+      await axios.get('http://localhost:8080/network/getNetworkByNetId/' + netId)
           .then(({ data }) => {
-            __graph_json_data.rootId = data
-            this.rootNodeId = data
+            this.netMessages.netName = data.netName
+            this.netMessages.netId = data.netId
+            this.netMessages.rootNodeId = data.rootNodeId
           }).catch(function (err) {
             console.log(err)
           })
@@ -97,6 +108,10 @@ export default {
           .then(({ data }) => {
             for (let i = 0; i < data.length; i++) {
               mp.set(data[i].nodeId, data[i].id)
+              if (data[i].nodeId === this.netMessages.rootNodeId) {
+                __graph_json_data.rootId = data[i].id
+                this.rootNodeId = data[i].id
+              }
               __graph_json_data.nodes.push({
                 id: data[i].id,
                 text: data[i].text,
