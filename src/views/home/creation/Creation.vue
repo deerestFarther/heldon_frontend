@@ -46,11 +46,21 @@ import UserPicture from '@/components/UserPicture'
 import NetworkBlock from '@/views/home/creation/components/NetworkBlock'
 import axios from 'axios'
 import CropperImage from '@/views/home/creation/components/CropperImage'
+import { checkSpecialKey } from '@/assets/validateMethods'
 
 export default {
   name: 'Creation',
   components: { CropperImage, UserPicture, NetworkBlock },
   data () {
+    let checkNetName = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error('请输入关系网名称'))
+      } else if (!checkSpecialKey(value)) {
+        return callback(new Error('不能含有特殊字符'))
+      } else {
+        return callback()
+      }
+    }
     return {
       dialogVisible: false,
       networkList: [],
@@ -60,7 +70,7 @@ export default {
         url: 'https://relation-network.oss-cn-chengdu.aliyuncs.com/pictures/defaultNetwork.png',
       },
       rules: {
-        netName: [{ required: true, message: '请输入关系网名称', trigger: 'blur' }],
+        netName: [{ validator: checkNetName, trigger: 'blur' }],
         tagId: [{ required: true, message: '请选择关系网标签', trigger: 'blur' }],
       },
       tagOptions: [],
@@ -74,7 +84,6 @@ export default {
     updateNetPic (event, data) {
       data.url = event
     },
-
     addNewNetwork (netName, tagId, url) {
       axios.post('http://www.pandub.cn:8080/network/insertNetwork/',
           {

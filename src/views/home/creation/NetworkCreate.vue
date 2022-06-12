@@ -57,11 +57,21 @@ import NodeEditor from '@/views/home/creation/components/NodeEditor'
 import axios from 'axios'
 import LineEditor from '@/views/home/creation/components/LineEditor'
 import CropperImage from '@/views/home/creation/components/CropperImage'
+import { checkSpecialKey } from '@/assets/validateMethods'
 
 export default {
   name: 'NetworkCreate',
   components: { CropperImage, LineEditor, NodeEditor, RelationGraph, NodeIdForm },
   data () {
+    let checkNetName = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error('请输入关系网名称'))
+      } else if (!checkSpecialKey(value)) {
+        return callback(new Error('不能含有特殊字符'))
+      } else {
+        return callback()
+      }
+    }
     return {
       netId: null,
       rootNodeId: '',
@@ -78,7 +88,8 @@ export default {
       netMessages: {},
       dialogVisible: false,
       rules: {
-        netName: [{ required: true, message: '关系网名不能为空', trigger: 'blur' }],
+        netName: [{ validator: checkNetName, trigger: 'blur' }],
+
       },
       curNet: {},
 

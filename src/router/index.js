@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import HomeView from '../views/HomeView.vue'
 import NetworkView from '@/views/home/creation/NetworkView'
 import Login from '@/views/log/Login.vue'
 import Register from '@/views/log/Register'
@@ -45,21 +44,6 @@ const routes = [
       path: '/my',
       component: My
     }]
-  },
-  {
-    path: '/home-view',
-    name: 'home-view',
-    component: HomeView
-  },
-  {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: function () {
-      return import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
-    }
   },
   {
     path: '/networkCreate',

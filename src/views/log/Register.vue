@@ -5,7 +5,8 @@
       <div class="left">
         <div style="color: #006e55">注册</div>
         <div class="verification">
-          <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+          <el-form :model="ruleForm" status-icon :rules="rules" ref="ruleForm" label-width="100px"
+                   class="demo-ruleForm">
             <el-form-item prop="account">
               <el-input v-model="ruleForm.account" placeholder="请输入用户名"></el-input>
             </el-form-item>
@@ -34,22 +35,21 @@
 </template>
 
 <script>
-import axios from "axios";
+import axios from 'axios'
 
 export default {
-  name: "Register",
-  data() {
+  name: 'Register',
+  data () {
     var checkAccount = (rule, value, callback) => {
       console.log(value)
       if (!value) {
-        return callback(new Error('用户名不能为空'));
-      }else if(value.length < 2 || value.length > 6)
-      {
+        return callback(new Error('用户名不能为空'))
+      } else if (value.length < 2 || value.length > 6) {
         return callback(new Error('用户名长度为2~6位'))
-      }else if (!this.checkSpecialKey(value)) {
-        callback(new Error("不能含有特殊字符"));
-      }else {
-        axios.get("http://www.pandub.cn:8080/authorization/exists/authorization/"+this.ruleForm.account).then(({data})=>{
+      } else if (!this.checkSpecialKey(value)) {
+        return callback(new Error('不能含有特殊字符'))
+      } else {
+        axios.get('http://www.pandub.cn:8080/authorization/exists/authorization/' + this.ruleForm.account).then(({ data }) => {
           console.log(data)
           if (!data) {
             return callback()
@@ -60,30 +60,30 @@ export default {
           console.log(err)
         })
       }
-    };
+    }
     var validatePass = (rule, value, callback) => {
       if (value === '') {
-        callback(new Error('密码不能为空'));
+        callback(new Error('密码不能为空'))
       } else {
-        if(value.length<4||value.length>12){
-          callback(new Error('密码长度为4~12位'));
-        }else {
+        if (value.length < 4 || value.length > 12) {
+          callback(new Error('密码长度为4~12位'))
+        } else {
           if (this.ruleForm.checkPass !== '') {
-            this.$refs.ruleForm.validateField('checkPass');
+            this.$refs.ruleForm.validateField('checkPass')
           }
-          callback();
+          callback()
         }
       }
-    };
+    }
     var validatePass2 = (rule, value, callback) => {
       if (value === '') {
-        callback(new Error('请再次输入密码'));
+        callback(new Error('请再次输入密码'))
       } else if (value !== this.ruleForm.pass) {
-        callback(new Error('两次输入密码不一致!'));
+        callback(new Error('两次输入密码不一致!'))
       } else {
-        callback();
+        callback()
       }
-    };
+    }
     return {
       save: 'false',
       ruleForm: {
@@ -102,54 +102,54 @@ export default {
           { validator: checkAccount, trigger: 'blur' }
         ]
       }
-    };
+    }
   },
   methods: {
-    handleSelect(key, keyPath) {
-      console.log(key, keyPath);
+    handleSelect (key, keyPath) {
+      console.log(key, keyPath)
     },
-    checkSpecialKey(str) {
+    checkSpecialKey (str) {
       let specialKey =
-          "[`~!#$^&*()=|{}':;'\\[\\].<>/?~！#￥……&*（）——|{}【】‘；：”“'。，、？]‘'";
+          '[`~!#$^&*()=|{}\':;\'\\[\\].<>/?~！#￥……&*（）——|{}【】‘；：”“\'。，、？]‘\''
       for (let i = 0; i < str.length; i++) {
         if (specialKey.indexOf(str.substr(i, 1)) !== -1) {
-          return false;
+          return false
         }
       }
-      return true;
+      return true
     },
-    submitForm(formName) {
+    submitForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          axios.post("http://www.pandub.cn:8080/authorization/add/authorization/new/"+"0"+"&&"+this.ruleForm.account
-          +"&&"+this.ruleForm.pass).then(({data})=> {
+          axios.post('http://www.pandub.cn:8080/authorization/add/authorization/new/' + '0' + '&&' + this.ruleForm.account
+              + '&&' + this.ruleForm.pass).then(({ data }) => {
             console.log(data)
-            if(data){
+            if (data) {
               this.$notify({
                 title: '成功',
                 message: '注册成功',
                 type: 'success'
-              });
+              })
               this.$router.push('/login')
-            }else {
+            } else {
               this.$notify.error({
                 title: '错误',
                 message: '注册失败'
-              });
-              return false;
+              })
+              return false
             }
-          }).catch((err)=>{
+          }).catch((err) => {
             console.log(err)
           })
         } else {
-          console.log('error submit!!');
+          console.log('error submit!!')
           this.$notify.error({
             title: '错误',
             message: '登录失败'
-          });
-          return false;
+          })
+          return false
         }
-      });
+      })
     },
   },
 }
@@ -164,7 +164,7 @@ export default {
   position: relative;
 }
 
-#headline{
+#headline {
   font-size: 50px;
   font-weight: 900;
   margin-top: 7%;
