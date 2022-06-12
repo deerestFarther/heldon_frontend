@@ -76,7 +76,7 @@ export default {
     },
 
     addNewNetwork (netName, tagId, url) {
-      axios.post('http://localhost:8080/network/insertNetwork/',
+      axios.post('http://www.pandub.cn:8080/network/insertNetwork/',
           {
             netName, tagId,
             userId: sessionStorage.getItem('userId'), url,
@@ -95,7 +95,7 @@ export default {
     },
     getNetworkListByUserId () {
       this.networkList = []
-      axios.get('http://localhost:8080/network/getNetworkByUserId/' + sessionStorage.getItem('userId'))
+      axios.get('http://www.pandub.cn:8080/network/getNetworkByUserId/' + sessionStorage.getItem('userId'))
           .then(({ data }) => {
             data.forEach((net) => {
               this.networkList.push({
@@ -110,7 +110,7 @@ export default {
           })
     },
     getTags () {
-      axios.get('http://localhost:8080/tag/getTags')
+      axios.get('http://www.pandub.cn:8080/tag/getTags')
           .then(({ data }) => {
             data.forEach((tag) => {
               this.tagOptions.push({
