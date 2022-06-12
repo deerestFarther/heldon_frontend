@@ -76,7 +76,7 @@ export default {
         if (valid) {
           // alert('submit!')
 
-          axios.post('http://localhost:8080/authorization/validate/authorization/' + this.ruleForm.account +
+          axios.post(this.serverUrl + 'authorization/validate/authorization/' + this.ruleForm.account +
               '&&' + this.ruleForm.pass
           ).then(({ data }) => {
             if (data) {

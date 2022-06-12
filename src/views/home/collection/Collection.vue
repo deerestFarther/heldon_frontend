@@ -124,7 +124,7 @@ export default {
       console.log(this.UserId)
     },
     collection(){
-      axios.get("http://localhost:8080/collection/get/collections/"+this.UserId).then(({data})=>{
+      axios.get(this.serverUrl + "collection/get/collections/"+this.UserId).then(({data})=>{
         if (data) {
           this.menu_list=data
           this.collection_id=data[0].collectionId
@@ -135,10 +135,10 @@ export default {
       })
     },
     likeCollection(){
-      axios.get("http://localhost:8080/collection/get/collection/id/"+this.UserId).then(({data})=>{
+      axios.get(this.serverUrl + "collection/get/collection/id/"+this.UserId).then(({data})=>{
         if (data) {
           //console.log('like',data)
-          axios.get("http://localhost:8080/collectionNetwork/get/cns/"+ data).then(({data})=>{
+          axios.get(this.serverUrl + "collectionNetwork/get/cns/"+ data).then(({data})=>{
             if (data) {
               //console.log('likes',data)
               this.lists=data
@@ -146,7 +146,7 @@ export default {
           }).catch((err) => {
             console.log(err)
           })
-          axios.get("http://localhost:8080/collection/get/collection/"+data).then(({data})=>{
+          axios.get(this.serverUrl + "collection/get/collection/"+data).then(({data})=>{
             if (data) {
               console.log('info',data[0].content)
               this.collection_content=data[0].content
@@ -177,7 +177,7 @@ export default {
         this.listsShow=false
       }else
         this.listsShow=true
-      axios.get("http://localhost:8080/collection/get/collection/"+this.collection_id).then(({data})=>{
+      axios.get(this.serverUrl + "collection/get/collection/"+this.collection_id).then(({data})=>{
         if (data) {
           console.log('info',data)
           this.collection_content=data[0].content
@@ -201,7 +201,7 @@ export default {
         if (valid) {
           this.innerVisible = false;
           this.dialogVisible = false;
-          axios.post('http://localhost:8080/collection/add/collection/' + this.form.name +
+          axios.post(this.serverUrl + 'collection/add/collection/' + this.form.name +
               '&&' + this.UserId+'&&'+this.form.info
           ).then(({ data }) => {
             if (data) {

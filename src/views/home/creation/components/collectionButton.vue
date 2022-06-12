@@ -47,7 +47,7 @@ export default {
   computed: {
     ifCollected: function () {
       if (!this.netId) return false
-      axios.post('http://localhost:8080/collectionNetwork/add/cn/' + this.netId + '/' + sessionStorage.getItem('userId'))
+      axios.post(this.serverUrl + 'collectionNetwork/add/cn/' + this.netId + '/' + sessionStorage.getItem('userId'))
           .then(({ data }) => {
             return data
           })
@@ -63,7 +63,7 @@ export default {
   methods: {
 
     getCollectionList () {
-      axios.get('http://localhost:8080/collection/get/collections/' + sessionStorage.getItem('userId'))
+      axios.get(this.serverUrl + 'collection/get/collections/' + sessionStorage.getItem('userId'))
           .then(({ data }) => {
             this.collectionOptions = []
             data.forEach((col) => {

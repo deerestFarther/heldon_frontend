@@ -57,7 +57,7 @@ export default {
   },
   methods: {
     addNewNetwork (netName, tagId) {
-      axios.post('http://localhost:8080/network/insertNetwork/' + netName
+      axios.post(this.serverUrl + 'network/insertNetwork/' + netName
           + '/' + sessionStorage.getItem('userId')
           + '/' + tagId)
           .then(({ data }) => {
@@ -68,7 +68,7 @@ export default {
           })
     },
     getNetworkListByUserId () {
-      axios.get('http://localhost:8080/network/getNetworkByUserId/' + sessionStorage.getItem('userId'))
+      axios.get(this.serverUrl + 'network/getNetworkByUserId/' + sessionStorage.getItem('userId'))
           .then(({ data }) => {
             data.forEach((net) => {
               this.networkList.push({
@@ -83,7 +83,7 @@ export default {
           })
     },
     getTags () {
-      axios.get('http://localhost:8080/tag/getTags')
+      axios.get(this.serverUrl + 'tag/getTags')
           .then(({ data }) => {
             console.log(data)
             data.forEach((tag) => {
