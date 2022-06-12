@@ -57,6 +57,7 @@
                 <i class="el-icon-folder"></i>
                 <span slot="title">{{ menu.collectionName }}</span>
               </el-menu-item>
+
             </el-menu>
         </el-aside>
         <el-main>
@@ -121,7 +122,7 @@ export default {
   methods: {
     getUserId(){
       this.UserId=sessionStorage.getItem('userId');
-      console.log(this.UserId)
+      //console.log(this.UserId)
     },
     collection(){
       axios.get("http://www.pandub.cn:8080/collection/get/collections/"+this.UserId).then(({data})=>{
@@ -140,15 +141,19 @@ export default {
           //console.log('like',data)
           axios.get("http://www.pandub.cn:8080/collectionNetwork/get/cns/"+ data).then(({data})=>{
             if (data) {
-              //console.log('likes',data)
+              console.log('likes',data)
               this.lists=data
+              if(data.length===0)
+                this.listsShow=false
+              else
+                this.listsShow=true
             }
           }).catch((err) => {
             console.log(err)
           })
           axios.get("http://www.pandub.cn:8080/collection/get/collection/"+data).then(({data})=>{
             if (data) {
-              console.log('info',data[0].content)
+              //console.log('info',data[0].content)
               this.collection_content=data[0].content
               this.reFresh= false
               this.$nextTick(()=>{
@@ -164,7 +169,7 @@ export default {
       })
     },
     getCollectionName(name){
-      console.log('collection',this.collection_id)
+      //console.log('collection',this.collection_id)
       this.collection_name=name.collectionName
       this.collection_id=name.collectionId
       if(this.collection_name==='我的喜爱'){
@@ -173,13 +178,21 @@ export default {
         this.Delete=true
         console.log(name)
       }
-      if(this.lists===[]){
-        this.listsShow=false
-      }else
-        this.listsShow=true
+      axios.get("http://www.pandub.cn:8080/collectionNetwork/get/cns/"+this.collection_id).then(({data})=>{
+        if (data) {
+          //console.log('net',data)
+          this.lists=data
+          if(data.length===0){
+            this.listsShow=false
+          }else
+            this.listsShow=true
+        }
+      }).catch((err) => {
+        console.log(err)
+      })
       axios.get("http://www.pandub.cn:8080/collection/get/collection/"+this.collection_id).then(({data})=>{
         if (data) {
-          console.log('info',data)
+          //console.log('info',data)
           this.collection_content=data[0].content
           this.reFresh= false
           this.$nextTick(()=>{
@@ -191,10 +204,10 @@ export default {
       })
     },
     handleOpen(key, keyPath) {
-      console.log(key, keyPath);
+     // console.log(key, keyPath);
     },
     handleClose(key, keyPath) {
-      console.log(key, keyPath);
+      //console.log(key, keyPath);
     },
     submitForm(form) {
       this.$refs[form].validate((valid) => {
@@ -210,7 +223,7 @@ export default {
                 message: '创建成功',
                 type: 'success'
               });
-              console.log(data)
+              //console.log(data)
               this.collection()
             }
           }).catch((err) => {
