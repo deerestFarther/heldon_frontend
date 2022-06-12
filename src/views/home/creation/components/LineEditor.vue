@@ -193,20 +193,32 @@ export default {
       console.log(this.curLine)
       await axios.put('http://localhost:8080/relation/updateRelation', this.curLine)
           .then(({ data }) => {
-            // console.log(data)
-            //成功
+            if (data) {
+              this.$message({
+                type: 'success',
+                message: '修改关系成功!'
+              })
+              //可以直接重新加载不过没必要
+              this.dialogVisible = false
+              line.fontColor = this.curLine.fontColor
+              line.text = this.curLine.text
+              line.lineShape = this.curLine.lineShape
+              line.lineWidth = this.curLine.lineWidth
+              line.color = this.curLine.color
+              line.data.content = this.curLine.content
+            } else {
+              this.$message({
+                type: 'error',
+                message: '修改关系失败!'
+              })
+            }
           })
           .catch((err) => {
-            // console.log(err)
+            this.$message({
+              type: 'error',
+              message: '修改关系失败!'
+            })
           })
-      //可以直接重新加载不过没必要
-      this.dialogVisible = false
-      line.fontColor = this.curLine.fontColor
-      line.text = this.curLine.text
-      line.lineShape = this.curLine.lineShape
-      line.lineWidth = this.curLine.lineWidth
-      line.color = this.curLine.color
-      line.data.content = this.curLine.content
     },
     cancelChangeLine () {
       this.dialogVisible = false
@@ -219,7 +231,6 @@ export default {
       }).then(() => {
             axios.delete('http://localhost:8080/relation/deleteRelationByEdgeId/' + lineId)
                 .then(({ data }) => {
-                  console.log(data)
                   if (data) {
                     this.$emit('lineUpdated')
                     this.$message({
@@ -234,6 +245,10 @@ export default {
                   }
                 })
                 .catch((err) => {
+                  this.$message({
+                    message: '删除关系失败',
+                    type: 'error'
+                  })
                   console.log(err)
                 })
           }
@@ -267,6 +282,10 @@ export default {
                 }
               })
               .catch((err) => {
+                this.$message({
+                  message: '添加关系失败',
+                  type: 'error'
+                })
                 console.log(err)
               })
         }

@@ -2,8 +2,34 @@
   <div class="network-box">
 
     <div class="network-data-box">
+      <div>
+
+        <h1> 关系网编辑 </h1>
+        <div> 关系网名：{{ netMessages.netName }}</div>
+        <div>
+          <img style="width: 100px;height: 100px;margin-bottom:20px "
+               :src="netMessages.url">
+        </div>
+        <el-button type="primary" icon="el-icon-edit" circle @click="changeNet"></el-button>
+        <el-button type="success" icon="el-icon-upload" round @click="updateNodeXY" style="margin-bottom: 22px">保存结点布局
+        </el-button>
+
+        <el-dialog title="修改关系网信息" :visible.sync="dialogVisible" width="30%" :close-on-click-modal=false>
+          <el-form :model="curNet" :rules="rules" ref="curNet">
+
+            <el-form-item prop="netName">
+              <el-input v-model="curNet.netName" :maxlength=15 show-word-limit/>
+            </el-form-item>
+            <cropper-image @imgUploaded="updateNetPic($event,curNet)" :img-url="curNet.url"
+                           style="margin-bottom: 10px" v-if="dialogVisible"></cropper-image>
+            <el-button type="primary" @click="confirmChangeNet">提交</el-button>
+            <el-button @click="dialogVisible=false">取消</el-button>
+          </el-form>
+        </el-dialog>
+      </div>
+
       <node-editor :current-node="currentNode" :id-list="idList" :net-id="netId"
-                   @nodeUpdated="nodeDataUpdate" @updateNodeXY="updateNodeList"></node-editor>
+                   @nodeUpdated="nodeDataUpdate"></node-editor>
       <el-divider></el-divider>
       <line-editor :currentLineToList="currentLineToList" :currentLineFromList="currentLineFromList"
                    :nodeOptions="nodeOptions" :currentNode="currentNode"
@@ -30,10 +56,11 @@ import NodeIdForm from '@/views/home/creation/components/NodeIdForm'
 import NodeEditor from '@/views/home/creation/components/NodeEditor'
 import axios from 'axios'
 import LineEditor from '@/views/home/creation/components/LineEditor'
+import CropperImage from '@/views/home/creation/components/CropperImage'
 
 export default {
   name: 'NetworkCreate',
-  components: { LineEditor, NodeEditor, RelationGraph, NodeIdForm },
+  components: { CropperImage, LineEditor, NodeEditor, RelationGraph, NodeIdForm },
   data () {
     return {
       netId: null,
@@ -47,7 +74,14 @@ export default {
         moveToCenterWhenResize: false,
         // 这里可以参考"Graph 图谱"中的参数进行设置
       },
+
       netMessages: {},
+      dialogVisible: false,
+      rules: {
+        netName: [{ required: true, message: '关系网名不能为空', trigger: 'blur' }],
+      },
+      curNet: {},
+
       currentNode: {
         data: {
           url: ''
@@ -107,7 +141,6 @@ export default {
         if (!(node.id === this.currentNode.id))
           this.idList.push(node.id)
       })
-      console.log(this.currentLineToList)
     },
 
     onLineClick (lineObject, $event) {
@@ -175,7 +208,7 @@ export default {
     //     })
     //   })
     // },
-    updateNodeList () {
+    updateNodeXY () {
       let list = []
       this.$refs.RN.getNodes().forEach((node) => {
         list.push({
@@ -200,39 +233,7 @@ export default {
             console.log(err)
           })
     },
-    async DeleteNode () {
-      await axios.get('http://localhost:8080/node/deleteNodeByNodeId/' + this.currentNode.data.id,
-      ).then((res) => {
-        this.$refs.RN.removeNodeById(this.currentNode.id)
-        let id
-        this.$refs.RN.getNodes().forEach((node) => {//重新选定rootNode
-          if (!node.data.ableDelete) {
-            id = node.id
-          }
-        })
-        this.focusNodeById(id)
-      }).catch((err) => {
-        console.log(err)
-      })
-    },
 
-    addLine (data) {
-      let __graph_json_data = {
-        nodes: [],
-        links: [
-          {
-            from: data.fromId,
-            to: data.toId,
-            text: '',
-          }
-        ]
-      }
-      this.$refs.RN.appendJsonData(__graph_json_data, (seeksRGGraph) => {
-        console.log(this.currentNode)
-        this.onNodeClick(this.currentNode.id)
-        this.focusNodeById(this.currentNode.id)
-      })
-    },
     //todo 设置默认显示的图片
 
     //通过netId获取后端的关于整个图的数据用于展示
@@ -247,6 +248,10 @@ export default {
             this.netMessages.netName = data.netName
             this.netMessages.netId = data.netId
             this.netMessages.rootNodeId = data.rootNodeId
+            this.netMessages.url = data.ext3
+            //权限检查
+            if (data.userId !== sessionStorage.getItem('user'))
+              this.$router.push('/login')
           }).catch(function (err) {
             console.log(err)
           })
@@ -322,6 +327,51 @@ export default {
         this.GetNetFromBackEnd(this.netId)//删除结点
       else
         this.GetNetFromBackEnd(this.netId, data)//添加结点
+    },
+    changeNet () {
+      this.dialogVisible = true
+      this.curNet = {
+        netName: this.netMessages.netName,
+        url: this.netMessages.url
+      }
+    },
+    updateNetPic (event, data) {
+      data.url = event
+    },
+    confirmChangeNet () {
+      this.$refs.curNet.validate((valid) => {
+        if (valid) {
+          axios.put('http://localhost:8080/network/updateNetNameByNetId/',
+              {
+                netName: this.curNet.netName,
+                url: this.curNet.url,
+                netId: this.netMessages.netId,
+              })
+              .then(({ data }) => {
+                if (data) {
+                  this.dialogVisible = false
+                  this.netMessages.netName = this.curNet.netName
+                  this.netMessages.url = this.curNet.url
+                  this.$message({
+                    message: '修改成功',
+                    type: 'success'
+                  })
+                } else {
+                  this.$message({
+                    message: '修改失败',
+                    type: 'error'
+                  })
+                }
+              })
+              .catch((err) => {
+                this.$message({
+                  message: '修改失败',
+                  type: 'error'
+                })
+              })
+        }
+      })
+
     }
   }
 }
@@ -343,7 +393,6 @@ export default {
   overflow-y: scroll;
   width: 500px;
 }
-
 
 .network-graph {
   overflow: hidden;

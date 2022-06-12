@@ -38,13 +38,26 @@ export default {
       })
     },
     deleteNetwork () {
-      axios.delete('http://localhost:8080/network/deleteNetworkByNetId/' + this.netId)
-          .then(({ data }) => {
-
-          })
-          .catch((err) => {
-
-          })
+      this.$confirm('此操作将永久删除该关系网，是否继续？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        axios.delete('http://localhost:8080/network/deleteNetworkByNetId/' + this.netId)
+            .then(({ data }) => {
+              this.$message({
+                type: 'success',
+                message: '关系网删除成功!'
+              })
+              this.$emit('networkDeleted')
+            })
+            .catch((err) => {
+              this.$message({
+                type: 'error',
+                message: '关系网删除成功!'
+              })
+            })
+      })
     }
   },
   props: ['imgUrl', 'netName', 'netId']

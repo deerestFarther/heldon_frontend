@@ -6,14 +6,18 @@
       </el-aside>
       <el-main class="main">
         <div v-for="item in networkList" :key="item.netId">
-          <network-block :img-url="item.url" :net-id="item.netId" :net-name="item.netName"></network-block>
+          <network-block :img-url="item.url" :net-id="item.netId" :net-name="item.netName"
+                         @networkDeleted="getNetworkListByUserId"></network-block>
         </div>
         <div>
           <el-button icon="el-icon-plus" @click="dialogVisible=true"></el-button>
           <el-dialog :visible.sync="dialogVisible" width="30%" :close-on-click-modal=false>
+
             <el-form :model="networkForm" status-icon :rules="rules" ref="nodeIdForm" label-width="100px"
                      class="demo-ruleForm">
-              <el-form-item label="关系网名称" prop="nodeId">
+              <cropper-image @imgUploaded="updateNetPic($event,networkForm)" style="margin-bottom: 10px"
+                             :img-url="networkForm.url" v-if="dialogVisible"></cropper-image>
+              <el-form-item label="关系网名称" prop="netName">
                 <el-input v-model="networkForm.netName" maxlength="15" show-word-limit></el-input>
               </el-form-item>
               <el-form-item label="关系网标签" prop="tagId">
@@ -23,7 +27,10 @@
                 </el-select>
               </el-form-item>
               <el-form-item>
-                <el-button type="primary" @click="addNewNetwork(networkForm.netName,networkForm.tagId)">提交</el-button>
+                <el-button type="primary"
+                           @click="addNewNetwork(networkForm.netName,networkForm.tagId,networkForm.url)">
+                  提交
+                </el-button>
                 <el-button @click="dialogVisible=false">取消</el-button>
               </el-form-item>
             </el-form>
@@ -38,16 +45,24 @@
 import UserPicture from '@/components/UserPicture'
 import NetworkBlock from '@/views/home/creation/components/NetworkBlock'
 import axios from 'axios'
+import CropperImage from '@/views/home/creation/components/CropperImage'
 
 export default {
   name: 'Creation',
-  components: { UserPicture, NetworkBlock },
+  components: { CropperImage, UserPicture, NetworkBlock },
   data () {
     return {
       dialogVisible: false,
       networkList: [],
-      networkForm: { netName: '', tagId: null },
-      rules: {},
+      networkForm: {
+        netName: '',
+        tagId: null,
+        url: 'https://relation-network.oss-cn-chengdu.aliyuncs.com/pictures/defaultNetwork.png',
+      },
+      rules: {
+        netName: [{ required: true, message: '请输入关系网名称', trigger: 'blur' }],
+        tagId: [{ required: true, message: '请选择关系网标签', trigger: 'blur' }],
+      },
       tagOptions: [],
     }
   },
@@ -56,18 +71,30 @@ export default {
     this.getNetworkListByUserId()
   },
   methods: {
-    addNewNetwork (netName, tagId) {
-      axios.post('http://localhost:8080/network/insertNetwork/' + netName
-          + '/' + sessionStorage.getItem('userId')
-          + '/' + tagId)
+    updateNetPic (event, data) {
+      data.url = event
+    },
+
+    addNewNetwork (netName, tagId, url) {
+      axios.post('http://localhost:8080/network/insertNetwork/',
+          {
+            netName, tagId,
+            userId: sessionStorage.getItem('userId'), url,
+          })
           .then(({ data }) => {
-            console.log(data)
+            this.dialogVisible = false
+            this.$message({
+              type: 'success',
+              message: '创建成功!'
+            })
+            this.getNetworkListByUserId()
           })
           .catch((err) => {
             console.log(err)
           })
     },
     getNetworkListByUserId () {
+      this.networkList = []
       axios.get('http://localhost:8080/network/getNetworkByUserId/' + sessionStorage.getItem('userId'))
           .then(({ data }) => {
             data.forEach((net) => {
@@ -85,7 +112,6 @@ export default {
     getTags () {
       axios.get('http://localhost:8080/tag/getTags')
           .then(({ data }) => {
-            console.log(data)
             data.forEach((tag) => {
               this.tagOptions.push({
                 value: tag.tagId,

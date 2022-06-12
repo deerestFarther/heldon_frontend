@@ -1,7 +1,6 @@
 <template>
   <div class="node-edit-box">
-    <el-button type="success" icon="el-icon-upload" round @click="updateNodeXY" style="margin-bottom: 22px">保存结点布局
-    </el-button>
+
     <div style="font-size: 24px;font-weight: 900;margin-bottom: 20px">结点编辑</div>
     <div>
       <img class="img-box" :src="currentNode.data.url"/>
@@ -39,9 +38,8 @@
 
     <el-dialog title="修改结点信息" :visible.sync="dialogVisible" width="30%" :close-on-click-modal=false>
       <el-form :model="curNode" :rules="rulesForUpdate" :ref="curNode">
-        <img class="img-box" :src="curNode.url" v-show="msgFormSon" style="margin-bottom: 10px;float: inherit;"/>
-        <cropper-image @imgUploaded="updateNodePic($event, curNode)" @func="getMsgFormSon"
-                       style="margin-bottom: 10px;"></cropper-image>
+        <cropper-image @imgUploaded="updateNodePic($event, curNode)" :img-url="curNode.url"
+                       style="margin-bottom: 10px;" v-if="dialogVisible"></cropper-image>
         <div style="height: 80px">
           <div class="node-edit-color" style="margin: 22px;">
             字体颜色
@@ -69,23 +67,23 @@
 
     <el-dialog title="添加新结点" :visible.sync="newNodeDialogVisible" width="30%" :close-on-click-modal=false>
       <el-form :model="newNodeForm" :rules="rulesForAdd" ref="newNodeForm">
-        <img class="img-box" :src="newNodeForm.url" v-show="msgFormSon" style="margin-bottom: 10px;float: inherit;"/>
-        <cropper-image @imgUploaded="updateNodePic($event,newNodeForm)" @func="getMsgFormSon"
-                       style="margin-bottom: 10px;"></cropper-image>
-        <div style="height: 80px">
-          <div class="node-edit-color" style="margin: 22px;">
+        <!-- 这个bug我不能接受！！！！！！！-->
+        <cropper-image @imgUploaded="updateNodePic($event,newNodeForm)" :img-url="newNodeForm.url"
+                       style="margin-bottom: 10px;" v-if="newNodeDialogVisible"></cropper-image>
+        <el-row>
+          <el-col>
             字体颜色
             <el-color-picker v-model="newNodeForm.fontColor" show-alpha :predefine="predefineColors"/>
-          </div>
-          <div class="node-edit-color" style="margin: 22px;">
+          </el-col>
+          <el-col>
             背景颜色
             <el-color-picker v-model="newNodeForm.color" show-alpha :predefine="predefineColors"/>
-          </div>
-          <div class="node-edit-color" style="margin: 22px;">
+          </el-col>
+          <el-col>
             边框颜色
             <el-color-picker v-model="newNodeForm.borderColor" show-alpha :predefine="predefineColors"/>
-          </div>
-        </div>
+          </el-col>
+        </el-row>
         <el-form-item prop="id">
           <el-input v-model="newNodeForm.id" :maxlength=15 show-word-limit placeholder="请输入结点名称"></el-input>
         </el-form-item>
@@ -177,7 +175,7 @@ export default {
       msgFormSon: true,
       newNodeForm: {
         id: '',//上传的时候把text加上
-        url: '',
+        url: 'https://relation-network.oss-cn-chengdu.aliyuncs.com/pictures/default.jpg',
         fontColor: '#111111',
         color: '#aaaaaa',
         borderColor: '#7f7f7f',
@@ -212,34 +210,54 @@ export default {
       this.curNode.text = this.curNode.id
       await axios.put('http://localhost:8080/node/updateNode', this.curNode)
           .then((data) => {
-            console.log(data)
+            if (data) {
+              this.$message({
+                type: 'success',
+                message: '结点修改成功!'
+              })
+              this.dialogVisible = false
+              node.id = this.curNode.id
+              node.text = this.curNode.id //id===text
+              node.color = this.curNode.color
+              node.borderColor = this.curNode.borderColor
+              node.fontColor = this.curNode.fontColor
+              node.data.content = this.curNode.content
+              node.data.url = this.curNode.url
+            } else {
+              this.$message({
+                type: 'error',
+                message: '结点修改失败!'
+              })
+            }
           })
           .catch((err) => {
             console.log(err)
+            this.$message({
+              type: 'error',
+              message: '结点修改失败!'
+            })
           })
-      node.id = this.curNode.id
-      node.text = this.curNode.id //id===text
-      node.color = this.curNode.color
-      node.borderColor = this.curNode.borderColor
-      node.fontColor = this.curNode.fontColor
-      node.data.content = this.curNode.content
-      node.data.url = this.curNode.url
-      this.dialogVisible = false
     },
     deleteNode (node) {
-      this.$confirm('此操作将永久删除该该结点和与之相关的关系，是否继续？', '提示', {
+      this.$confirm('此操作将永久删除该结点和与之相关的关系，是否继续？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
             axios.delete('http://localhost:8080/node/deleteNodeByNodeId/' + node.data.id)
                 .then(({ data }) => {
-                  console.log(data)
-                  this.$emit('nodeUpdated')
-                  this.$message({
-                    type: 'success',
-                    message: '删除成功!'
-                  })
+                  if (data) {
+                    this.$emit('nodeUpdated')
+                    this.$message({
+                      type: 'success',
+                      message: '结点删除成功!'
+                    })
+                  } else {
+                    this.$message({
+                      type: 'error',
+                      message: '结点删除失败!'
+                    })
+                  }
                 })
                 .catch((err) => {
                   console.log(err)
@@ -270,29 +288,26 @@ export default {
                   this.$refs.newNodeForm.resetFields()
                   this.newNodeDialogVisible = false
                   this.$message({
-                    message: '添加结点成功',
+                    message: '结点添加成功',
                     type: 'success'
                   })
                 } else {
                   this.$message({
-                    message: '添加结点失败',
+                    message: '结点添加失败',
                     type: 'error'
                   })
                 }
               })
               .catch((err) => {
-                console.log(err)
+                this.$message({
+                  message: '结点添加失败',
+                  type: 'error'
+                })
               })
         }
       })
     },
-    updateNodeXY () {
-      this.$emit('updateNodeXY')
-    },
-    getMsgFormSon (data) {
-      this.msgFormSon = data
-      console.log(this.msgFormSon)
-    }
+
   },
   mounted () {
     console.log(this.currentNode)
