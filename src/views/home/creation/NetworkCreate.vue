@@ -250,7 +250,7 @@ export default {
             this.netMessages.rootNodeId = data.rootNodeId
             this.netMessages.url = data.ext3
             //权限检查
-            if (data.userId !== sessionStorage.getItem('user'))
+            if (data.userId.toString() !== sessionStorage.getItem('userId'))
               this.$router.push('/login')
           }).catch(function (err) {
             console.log(err)
