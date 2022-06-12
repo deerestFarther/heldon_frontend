@@ -3,12 +3,10 @@
     <el-container class="el-container-search" id="search">
       <SearchBar/>
     </el-container>
-    <el-container class="el-container-rns" id="rns-wrapper">
-      <CategorizedRns/>
+    <el-container class="el-container-rns" id="rns-wrapper" v-for="item in categories">
+      <CategorizedRns :category="item"/>
     </el-container>
-    <el-container class="el-container-rns" id="rns-wrapper">
-      <CategorizedRns/>
-    </el-container>
+
   </div>
 </template>
 
@@ -22,7 +20,22 @@ export default {
   name: "Welcome",
   //注册组件
   components:{SearchBar,CategorizedRns},
-
+  data(){
+    return{
+      categories:[]
+    }
+  },
+  created () {
+    axios.get('http://localhost:8080/tag/getTags').then(({ data }) => {
+      console.log(data)
+      data.forEach((category)=>{
+        this.categories.push({
+          tagId:category.tagId,
+          tagName:category.tagName
+        })
+      })
+    })
+  }
 }
 
 

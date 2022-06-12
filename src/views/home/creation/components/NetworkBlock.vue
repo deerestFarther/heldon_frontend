@@ -43,7 +43,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        axios.delete('http://www.pandub.cn:8080/network/deleteNetworkByNetId/' + this.netId)
+        axios.delete('http://localhost:8080/network/deleteNetworkByNetId/' + this.netId)
             .then(({ data }) => {
               this.$message({
                 type: 'success',

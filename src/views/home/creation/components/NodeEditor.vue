@@ -208,7 +208,7 @@ export default {
     async confirmChangeNode (node) {
       this.curNode.nodeName = this.curNode.id
       this.curNode.text = this.curNode.id
-      await axios.put('http://www.pandub.cn:8080/node/updateNode', this.curNode)
+      await axios.put('http://localhost:8080/node/updateNode', this.curNode)
           .then((data) => {
             if (data) {
               this.$message({
@@ -244,7 +244,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-            axios.delete('http://www.pandub.cn:8080/node/deleteNodeByNodeId/' + node.data.id)
+            axios.delete('http://localhost:8080/node/deleteNodeByNodeId/' + node.data.id)
                 .then(({ data }) => {
                   if (data) {
                     this.$emit('nodeUpdated')
@@ -281,7 +281,7 @@ export default {
           this.newNodeForm.text = this.newNodeForm.id
           this.newNodeForm.nodeName = this.newNodeForm.id
           this.newNodeForm.netId = this.netId
-          axios.post('http://www.pandub.cn:8080/node/insertOneNode', this.newNodeForm)
+          axios.post('http://localhost:8080/node/insertOneNode', this.newNodeForm)
               .then(({ data }) => {
                 if (data) {
                   this.$emit('nodeUpdated', this.newNodeForm.id)
