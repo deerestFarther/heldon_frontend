@@ -46,8 +46,10 @@ export default {
       }else if(value.length < 2 || value.length > 6)
       {
         return callback(new Error('用户名长度为2~6位'))
-      } else {
-        axios.get("http://localhost:8080/authorization/exists/authorization/"+this.ruleForm.account).then(({data})=>{
+      }else if (!this.checkSpecialKey(value)) {
+        callback(new Error("不能含有特殊字符"));
+      }else {
+        axios.get("http://www.pandub.cn:8080/authorization/exists/authorization/"+this.ruleForm.account).then(({data})=>{
           console.log(data)
           if (!data) {
             return callback()
@@ -106,10 +108,20 @@ export default {
     handleSelect(key, keyPath) {
       console.log(key, keyPath);
     },
+    checkSpecialKey(str) {
+      let specialKey =
+          "[`~!#$^&*()=|{}':;'\\[\\].<>/?~！#￥……&*（）——|{}【】‘；：”“'。，、？]‘'";
+      for (let i = 0; i < str.length; i++) {
+        if (specialKey.indexOf(str.substr(i, 1)) !== -1) {
+          return false;
+        }
+      }
+      return true;
+    },
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          axios.post("http://localhost:8080/authorization/add/authorization/new/"+"0"+"&&"+this.ruleForm.account
+          axios.post("http://www.pandub.cn:8080/authorization/add/authorization/new/"+"0"+"&&"+this.ruleForm.account
           +"&&"+this.ruleForm.pass).then(({data})=> {
             console.log(data)
             if(data){

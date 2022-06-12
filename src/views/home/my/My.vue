@@ -70,8 +70,19 @@ export default {
       }else if(value.length < 2 || value.length > 6)
       {
         return callback(new Error('用户名长度为2~6位'))
-      } else {
-        return callback()
+      }else if (!this.checkSpecialKey(value)) {
+        callback(new Error("不能含有特殊字符"));
+      }else {
+        axios.get("http://www.pandub.cn:8080/authorization/exists/authorization/"+this.ruleForm.account).then(({data})=>{
+          console.log(data)
+          if (!data) {
+            return callback()
+          } else {
+            return callback(new Error('该用户名已存在'))
+          }
+        }).catch((err) => {
+          console.log(err)
+        })
       }
     };
     return{
@@ -100,6 +111,16 @@ export default {
     this.getUser()
   },
   methods:{
+    checkSpecialKey(str) {
+      let specialKey =
+          "[`~!#$^&*()=|{}':;'\\[\\].<>/?~！#￥……&*（）——|{}【】‘；：”“'。，、？]‘'";
+      for (let i = 0; i < str.length; i++) {
+        if (specialKey.indexOf(str.substr(i, 1)) !== -1) {
+          return false;
+        }
+      }
+      return true;
+    },
     stringToDate(strDate) {
   var tempStrs = strDate.substr(0,19);
   var temp=tempStrs.replace('-','年')

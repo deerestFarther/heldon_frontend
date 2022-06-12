@@ -150,7 +150,7 @@ export default {
               type: 'success',
               message: '删除成功!'
             });
-            this.$router.go(0)
+            location.reload()
           }
         }).catch((err) => {
           console.log(err)
@@ -197,7 +197,7 @@ export default {
               '&&'+ this.collection_id+'&&'+this.collection_name+'&&'+this.ruleForm1.name).then(({data})=>{
             if (data) {
               console.log('info',data)
-              this.$router.go(0)
+              location.reload()
             }
           }).catch((err) => {
             console.log(err)

@@ -3,7 +3,7 @@
   <el-container>
     <el-header>
       <div id="title">亿网达尽</div>
-      <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect" :router="true">
+      <el-menu :default-active="$route.path" class="el-menu-demo" mode="horizontal" @select="handleSelect" :router="true">
         <el-menu-item index="/welcome">首页</el-menu-item>
         <el-menu-item index="/creation">创作</el-menu-item>
         <el-menu-item index="/collection">收藏</el-menu-item>
