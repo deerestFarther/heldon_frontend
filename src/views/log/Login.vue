@@ -55,7 +55,7 @@ export default {
       }
     }
     return {
-      save: 'false',
+      save: false,
       ruleForm: {
         pass: '',
         account: '',
@@ -75,12 +75,8 @@ export default {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           // alert('submit!')
-          this.$notify({
-            title: '成功',
-            message: '登录',
-            type: 'success'
-          })
-          axios.post('http://www.pandub.cn:8080/authorization/validate/authorization/' + this.ruleForm.account +
+
+          axios.post('http://localhost:8080/authorization/validate/authorization/' + this.ruleForm.account +
               '&&' + this.ruleForm.pass
           ).then(({ data }) => {
             if (data) {
@@ -98,19 +94,17 @@ export default {
           }).catch((err) => {
             console.log(err)
           })
-          // window.sessionStorage.setItem("token",token值)
         } else {
           this.$notify.error({
             title: '错误',
             message: '登录失败'
           })
           console.log('error submit!!')
-          return false
         }
       })
     },
     handleSave: function () {
-      this.save = 'ture'
+      this.save = true
       localStorage.setItem('save', this.save)
       console.log(localStorage.save)
     },

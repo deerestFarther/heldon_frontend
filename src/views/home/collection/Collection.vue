@@ -24,11 +24,11 @@
                 append-to-body>
               <div slot="footer" class="dialog-footer">
                 <el-button @click="innerVisible = false">取 消</el-button>
-                <el-button type="primary" @click="handleSuccess">确 定</el-button>
+                <el-button type="primary" @click=" submitForm('form')">确 定</el-button>
               </div>
             </el-dialog>
-            <el-form :model="form">
-              <el-form-item>
+            <el-form :model="form" :rules="forms" ref="form">
+              <el-form-item prop="name">
                 <el-input v-model="form.name"
                           placeholder="请输入收藏夹名称"
                           maxlength="10"
@@ -44,89 +44,29 @@
             </el-form>
             <span slot="footer" class="dialog-footer">
     <el-button @click="dialogVisible = false">取 消</el-button>
-    <el-button type="primary" @click="innerVisible = true">确 定</el-button>
+    <el-button type="primary" @click="innerVisible=true">确 定</el-button>
   </span>
           </el-dialog>
 
           <el-menu
-                default-active="1"
+                default-active="0"
                 class="el-menu-vertical-demo"
                 @open="handleOpen"
                 @close="handleClose">
-              <el-menu-item index="1">
+              <el-menu-item :index="i+''" v-for="(menu,i) in menu_list" @click="getCollectionName(menu)">
                 <i class="el-icon-folder"></i>
-                <span slot="title">导航三</span>
-                <div class="num">数量</div>
-              </el-menu-item>
-              <el-menu-item index="2">
-                <i class="el-icon-folder"></i>
-                <span slot="title">导航四</span>
-                <div class="num">数量</div>
+                <span slot="title">{{ menu.collectionName }}</span>
               </el-menu-item>
             </el-menu>
         </el-aside>
         <el-main>
-          <el-container>
-            <el-header>
-              <div style="margin-bottom: 10px;display: flex;" v-show="!editVisible">
-                <div style="float: left;">我喜欢</div>
-                <i class="el-icon-edit-outline"
-                   v-show="Delete"
-                   @click="editVisible=true"
-                   style="margin: 3px 0 0 5px"></i>
-              </div>
-              <div style="margin-bottom: 10px;" v-show="editVisible">
-                <el-input v-model="input" placeholder="请添加收藏夹描述" style="display: table-cell;"></el-input>
-                <el-button type="success" icon="el-icon-check" circle
-                           style="position: fixed; margin: -30px -112px;"
-                           size="small"
-                           @click="editVisible=false"></el-button>
-                <el-button type="danger" icon="el-icon-close" circle
-                           style="position: fixed; margin: -30px -72px;"
-                           size="small"
-                           @click="editVisible=false"></el-button>
-              </div>
-              <div style="float: left;" v-show="!inputVisible">
-                请添加收藏夹描述
-                <i class="el-icon-edit-outline" @click="inputVisible=true"></i>
-              </div>
-              <div style="float: left;" v-show="inputVisible">
-                <el-input v-model="input" placeholder="请添加收藏夹描述"></el-input>
-                <el-button type="success" icon="el-icon-check" circle
-                           style="position: fixed; margin-left: 10px"
-                           size="small"
-                           @click="inputVisible=false"></el-button>
-                <el-button type="danger" icon="el-icon-close" circle
-                           style="position: fixed;"
-                           size="small"
-                           @click="inputVisible=false"></el-button>
-              </div>
-              <el-button type="text" @click="open" class="button_text" v-show="Delete">删除收藏夹</el-button>
-            </el-header>
-            <el-main>
-              <el-row :gutter="20">
-                <el-col :span="8" v-for="(o, index) in 3" :key="o" :offset="index > 0 ? 0.5 : 0">
-                  <el-card :body-style="{ padding: '0px' }">
-                    <img src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png" class="image">
-                    <div style="padding: 12px;">
-                      <div class="bottom clearfix">
-                        <div>
-                          <img src="../../../assets/picture/like.png" class="like_at">
-                          <div class="title">200</div>
-                        </div>
-                        <div>
-                          <img src="../../../assets/picture/at.png" class="like_at">
-                          <div class="title">200</div>
-                        </div>
-                      </div>
-                      <span>好吃的汉堡</span>
-                    </div>
-                  </el-card>
-                </el-col>
-              </el-row>
-              <el-button type="success" round>去  添  加</el-button>
-            </el-main>
-          </el-container>
+          <collection-show :collection_name="collection_name"
+                           :Delete="Delete"
+                           :lists="lists"
+                           :listsShow="listsShow"
+                           v-if="reFresh"
+                           :collection_id="collection_id"
+                           :collection_content="collection_content"/>
         </el-main>
       </el-container>
     </el-main>
@@ -136,62 +76,152 @@
 
 <script>
 import UserPicture from "@/components/UserPicture";
+import axios from "axios";
+import CollectionShow from "@/views/home/collection/CollectionShow";
 export default {
   name: "Collection",
-  components: {UserPicture},
+  components: {CollectionShow, UserPicture},
   data(){
+    var validateName = (rule, value, callback) => {
+      console.log(value)
+      if (!value) {
+        return callback(new Error('收藏夹名称不能为空'));
+      }else
+        return callback()
+    };
     return{
-      menu_list:[],
+      lists:[],
+      menu_list: Array,
       dialogVisible: false,
       innerVisible: false,
-      inputVisible:false,
-      editVisible:false,
-      input: '',
-      Delete: true,
-      currentDate: new Date(),
+      names:Array,
+      collection_name:'我的喜爱',
+      collection_id:'',
+      collection_content:'',
+      UserId:'',
+      Delete: false,
+      listsShow:false,
+      reFresh:true,
       form: {
         name: '',
         info: '',
-        delivery: false,
-        type: [],
-        resource: '',
-        desc: ''
+      },
+      forms: {
+        name: [
+          { validator: validateName, trigger: 'blur' }
+        ],
       },
     }
   },
+  created() {
+    this.getUserId();
+    this.collection();
+    this.likeCollection()
+  },
   methods: {
+    getUserId(){
+      this.UserId=sessionStorage.getItem('userId');
+      console.log(this.UserId)
+    },
+    collection(){
+      axios.get("http://localhost:8080/collection/get/collections/"+this.UserId).then(({data})=>{
+        if (data) {
+          this.menu_list=data
+          this.collection_id=data[0].collectionId
+          //console.log('id',this.collection_id)
+        }
+      }).catch((err) => {
+        console.log(err)
+      })
+    },
+    likeCollection(){
+      axios.get("http://localhost:8080/collection/get/collection/id/"+this.UserId).then(({data})=>{
+        if (data) {
+          //console.log('like',data)
+          axios.get("http://localhost:8080/collectionNetwork/get/cns/"+ data).then(({data})=>{
+            if (data) {
+              //console.log('likes',data)
+              this.lists=data
+            }
+          }).catch((err) => {
+            console.log(err)
+          })
+          axios.get("http://localhost:8080/collection/get/collection/"+data).then(({data})=>{
+            if (data) {
+              console.log('info',data[0].content)
+              this.collection_content=data[0].content
+              this.reFresh= false
+              this.$nextTick(()=>{
+                this.reFresh = true
+              })
+            }
+          }).catch((err) => {
+            console.log(err)
+          })
+        }
+      }).catch((err) => {
+        console.log(err)
+      })
+    },
+    getCollectionName(name){
+      console.log('collection',this.collection_id)
+      this.collection_name=name.collectionName
+      this.collection_id=name.collectionId
+      if(this.collection_name==='我的喜爱'){
+        this.Delete=false;
+      }else {
+        this.Delete=true
+        console.log(name)
+      }
+      if(this.lists===[]){
+        this.listsShow=false
+      }else
+        this.listsShow=true
+      axios.get("http://localhost:8080/collection/get/collection/"+this.collection_id).then(({data})=>{
+        if (data) {
+          console.log('info',data)
+          this.collection_content=data[0].content
+          this.reFresh= false
+          this.$nextTick(()=>{
+            this.reFresh = true
+          })
+        }
+      }).catch((err) => {
+        console.log(err)
+      })
+    },
     handleOpen(key, keyPath) {
       console.log(key, keyPath);
     },
     handleClose(key, keyPath) {
       console.log(key, keyPath);
     },
-    handleSuccess(){
-      this.innerVisible = false;
-      this.dialogVisible = false;
-      this.$notify({
-        title: '成功',
-        message: '创建成功',
-        type: 'success'
+    submitForm(form) {
+      this.$refs[form].validate((valid) => {
+        if (valid) {
+          this.innerVisible = false;
+          this.dialogVisible = false;
+          axios.post('http://localhost:8080/collection/add/collection/' + this.form.name +
+              '&&' + this.UserId+'&&'+this.form.info
+          ).then(({ data }) => {
+            if (data) {
+              this.$notify({
+                title: '成功',
+                message: '创建成功',
+                type: 'success'
+              });
+              console.log(data)
+              this.collection()
+            }
+          }).catch((err) => {
+            console.log(err)
+          })
+        } else {
+          console.log('error submit!!');
+          return false;
+        }
       });
     },
-    open() {
-      this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.$message({
-          type: 'success',
-          message: '删除成功!'
-        });
-      }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消删除'
-        });
-      });
-    }
   }
 }
 </script>

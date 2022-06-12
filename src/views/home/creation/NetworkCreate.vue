@@ -47,7 +47,7 @@ export default {
         moveToCenterWhenResize: false,
         // 这里可以参考"Graph 图谱"中的参数进行设置
       },
-
+      netMessages: {},
       currentNode: {
         data: {
           url: ''
@@ -65,7 +65,7 @@ export default {
         changeNodeName: false,
         originalName: '',
       },
-      idList: [],
+      idList: [], //存放了当前结点以外的所有结点的id
     }
   },
 
@@ -113,69 +113,68 @@ export default {
     onLineClick (lineObject, $event) {
       console.log('onLineClick:', lineObject)
     },
-    inputNodeText (e) {
-      this.currentNode.text = e.target.value
-    },
-
-    addNode (newNodeId) {//添加node时，其保证的不是整体id唯一，而是添加所有node的id唯一
-      let newNode = {
-        id: newNodeId,
-        text: newNodeId,
-        color: '#ffffff',
-        borderColor: '#ffffff',
-        fontColor: '#000000',
-        borderWidth: 3,
-        data: { url: '', id: '', content: '' },
-        x: 0,
-        y: 0,
-      }
-      let __graph_json_data = {
-        nodes: [
-          newNode
-        ],
-        links: []
-      }
-      axios.post('http://www.pandub.cn:8080/node/insertOneNode', {
-        netId: this.netId,
-        nodeName: newNode.id,
-        id: newNode.id,
-        text: newNode.text,
-        color: newNode.color,
-        borderColor: newNode.borderColor,
-        fontColor: newNode.fontColor,
-        content: newNode.data.content,
-        x: newNode.x,
-        y: newNode.y,
-        url: newNode.data.url
-      }).then((res) => {
-        this.$refs.RN.appendJsonData(__graph_json_data, (seeksRGGraph) => {
-          // 这些写上当图谱初始化完成后需要执行的代码
-          this.onNodeClick(this.$refs.RN.getNodeById(newNodeId))
-          this.focusNodeById(newNodeId)
-          this.updateMsg4Cp()
-        })
-      }).catch((err) => {
-        console.log(err)
-      })
-    },
-    saveLastNodeList () {
-      let currentNodeList = this.$refs.RN.getNodes()
-      currentNodeList.forEach((node) => {
-        this.lastNodeList.push({
-          borderColor: node.borderColor,
-          color: node.color,
-          data: {
-            url: node.data.url,
-            content: node.data.content,
-          },
-          fontColor: node.fontColor,
-          id: node.id,
-          text: node.text,
-          x: node.x,
-          y: node.y,
-        })
-      })
-    },
+    // inputNodeText (e) {
+    //   this.currentNode.text = e.target.value
+    // },
+    // addNode (newNodeId) {//添加node时，其保证的不是整体id唯一，而是添加所有node的id唯一
+    //   let newNode = {
+    //     id: newNodeId,
+    //     text: newNodeId,
+    //     color: '#ffffff',
+    //     borderColor: '#ffffff',
+    //     fontColor: '#000000',
+    //     borderWidth: 3,
+    //     data: { url: '', id: '', content: '' },
+    //     x: 0,
+    //     y: 0,
+    //   }
+    //   let __graph_json_data = {
+    //     nodes: [
+    //       newNode
+    //     ],
+    //     links: []
+    //   }
+    //   axios.post('http://localhost:8080/node/insertOneNode', {
+    //     netId: this.netId,
+    //     nodeName: newNode.id,
+    //     id: newNode.id,
+    //     text: newNode.text,
+    //     color: newNode.color,
+    //     borderColor: newNode.borderColor,
+    //     fontColor: newNode.fontColor,
+    //     content: newNode.data.content,
+    //     x: newNode.x,
+    //     y: newNode.y,
+    //     url: newNode.data.url
+    //   }).then((res) => {
+    //     this.$refs.RN.appendJsonData(__graph_json_data, (seeksRGGraph) => {
+    //       // 这些写上当图谱初始化完成后需要执行的代码
+    //       this.onNodeClick(this.$refs.RN.getNodeById(newNodeId))
+    //       this.focusNodeById(newNodeId)
+    //       this.updateMsg4Cp()
+    //     })
+    //   }).catch((err) => {
+    //     console.log(err)
+    //   })
+    // },
+    // saveLastNodeList () {
+    //   let currentNodeList = this.$refs.RN.getNodes()
+    //   currentNodeList.forEach((node) => {
+    //     this.lastNodeList.push({
+    //       borderColor: node.borderColor,
+    //       color: node.color,
+    //       data: {
+    //         url: node.data.url,
+    //         content: node.data.content,
+    //       },
+    //       fontColor: node.fontColor,
+    //       id: node.id,
+    //       text: node.text,
+    //       x: node.x,
+    //       y: node.y,
+    //     })
+    //   })
+    // },
     updateNodeList () {
       let list = []
       this.$refs.RN.getNodes().forEach((node) => {
@@ -185,15 +184,24 @@ export default {
           y: node.y,
         })
       })
-      axios.put('http://www.pandub.cn:8080/node/updateNodeList', list)
+      axios.put('http://localhost:8080/node/updateNodeList', list)
           .then((res) => {
+            this.$message({
+              type: 'success',
+              message: '保存成功'
+            })
             //更新成功
-          }).catch((err) => {
-        console.log(err)
-      })
+          })
+          .catch((err) => {
+            this.$message({
+              type: 'error',
+              message: '保存失败'
+            })
+            console.log(err)
+          })
     },
     async DeleteNode () {
-      await axios.get('http://www.pandub.cn:8080/node/deleteNodeByNodeId/' + this.currentNode.data.id,
+      await axios.get('http://localhost:8080/node/deleteNodeByNodeId/' + this.currentNode.data.id,
       ).then((res) => {
         this.$refs.RN.removeNodeById(this.currentNode.id)
         let id
@@ -234,19 +242,24 @@ export default {
         nodes: [],
         links: [],
       }
-      await axios.get('http://www.pandub.cn:8080/network/getRootIdNameByNetId/' + netId)
+      await axios.get('http://localhost:8080/network/getNetworkByNetId/' + netId)
           .then(({ data }) => {
-            __graph_json_data.rootId = data
-            this.rootNodeId = data
+            this.netMessages.netName = data.netName
+            this.netMessages.netId = data.netId
+            this.netMessages.rootNodeId = data.rootNodeId
           }).catch(function (err) {
             console.log(err)
           })
       //初始化nodes
       let mp = new Map() //nodeId 到 id 的映射
-      await axios.get('http://www.pandub.cn:8080/node/getNodeListByNetId/' + netId)
+      await axios.get('http://localhost:8080/node/getNodeListByNetId/' + netId)
           .then(({ data }) => {
             for (let i = 0; i < data.length; i++) {
               mp.set(data[i].nodeId, data[i].id)
+              if (data[i].nodeId === this.netMessages.rootNodeId) {
+                __graph_json_data.rootId = data[i].id
+                this.rootNodeId = data[i].id
+              }
               __graph_json_data.nodes.push({
                 id: data[i].id,
                 text: data[i].text,
@@ -268,7 +281,7 @@ export default {
           }).catch(function (err) {
             console.log(err)
           })
-      await axios.get('http://www.pandub.cn:8080/relation/getRelationListByNetId/' + netId)
+      await axios.get('http://localhost:8080/relation/getRelationListByNetId/' + netId)
           .then(({ data }) => {
             for (let i = 0; i < data.length; i++) {
               __graph_json_data.links.push({
@@ -326,7 +339,7 @@ export default {
 .network-data-box {
   display: flex;
   flex-flow: column nowrap;
-  height: 100%;
+  height: calc(100vh);
   overflow-y: scroll;
   width: 500px;
 }

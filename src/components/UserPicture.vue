@@ -1,29 +1,47 @@
 <template>
 <div>
   <div class="user_picture"></div>
-  <div class="user_name">{{username}}</div>
-  <div class="user_info">
-    <div class="user_inf">
-      <div class="user_info_title">点赞</div>
-      <div class="user_info_num">3.5万</div>
-    </div>
-    <div class="user_inf">
-      <div class="user_info_title">收藏</div>
-      <div class="user_info_num">1030个</div>
-    </div>
-  </div>
+  <div class="user_name">{{ UserName }}</div>
+<!--  <div class="user_info">-->
+<!--    <div class="user_inf">-->
+<!--      <div class="user_info_title">点赞</div>-->
+<!--      <div class="user_info_num">3.5万</div>-->
+<!--    </div>-->
+<!--    <div class="user_inf">-->
+<!--      <div class="user_info_title">收藏</div>-->
+<!--      <div class="user_info_num">1030个</div>-->
+<!--    </div>-->
+<!--  </div>-->
 </div>
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "UserPicture",
   data(){
     return{
-      username:'用户名'
+      UserId:'',
+      UserName:''
+    }
+  },
+  created() {
+    this.username()
+  },
+  methods:{
+    username(){
+      this.UserId=sessionStorage.getItem('userId');
+      axios.get("http://localhost:8080/user/getInfoByUserId/"+this.UserId).then(({data})=>{
+        if (data) {
+          this.UserName=data.nickname
+          console.log('user',data.nickname)
+        }
+      }).catch((err) => {
+        console.log(err)
+      })
     }
   }
-
 }
 </script>
 

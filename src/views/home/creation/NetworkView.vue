@@ -2,6 +2,12 @@
   <div class="network-box">
 
     <div class="network-data-box">
+      <div>
+        <h1>
+          {{ netMessages.netName }}
+          <collection-button :net-id="netId" ref="collectionButton"></collection-button>
+        </h1>
+      </div>
       <node-view :current-node="currentNode"></node-view>
       <line-view :current-line-from-list="currentLineFromList"
                  :current-line-to-list="currentLineToList"
@@ -27,10 +33,12 @@ import RelationGraph from 'relation-graph'
 import NodeView from '@/views/home/creation/components/NodeView'
 import LineView from '@/views/home/creation/components/LineView'
 import axios from 'axios'
+import collectionButton from '@/views/home/creation/components/collectionButton'
+import CollectionButton from '@/views/home/creation/components/collectionButton'
 
 export default {
   name: 'NetworkView',
-  components: { NodeView, LineView, RelationGraph },
+  components: { CollectionButton, NodeView, LineView, RelationGraph },
   data () {
     return {
       netId: null,
@@ -43,6 +51,7 @@ export default {
         moveToCenterWhenResize: false,
         // 这里可以参考"Graph 图谱"中的参数进行设置
       },
+      netMessages: {},
       currentNode: {
         data: {
           url: ''
@@ -50,11 +59,12 @@ export default {
       },
       currentLineToList: [], //from为currentNode
       currentLineFromList: [],//to为currentNode
+      ifCollected: false,
     }
   },
   mounted () {
     this.netId = this.$route.query.netId
-    console.log(this.GetNetFromBackEnd(this.netId))
+    this.GetNetFromBackEnd(this.netId)
     // this.showRN()
   },
 
@@ -67,34 +77,41 @@ export default {
       this.currentLineToList = []
       this.currentLineFromList = []
       this.$refs.RN.getLines().forEach((line) => {//获得与当前结点有关的关系
-        if (line.fromNode.id === nodeObject.id) {//id是string
-          this.currentLineToList.push.apply(this.currentLineToList, line.relations)
-        }
-        if (line.toNode.id === nodeObject.id) {
-          this.currentLineFromList.push.apply(this.currentLineFromList, line.relations)
-        }
+        line.relations.forEach((relation) => {
+          if (relation.data.from === nodeObject.id) {//id是string
+            this.currentLineToList.push(relation)
+          }
+          if (relation.data.to === nodeObject.id) {
+            this.currentLineFromList.push(relation)
+          }
+        })
       })
-      console.log(this.currentLineToList)
     },
     //通过netId获取后端的关于整个图的数据用于展示
-    async GetNetFromBackEnd (netId) {
+    async GetNetFromBackEnd (netId, nodeId) {
       let __graph_json_data = {
         rootId: '',//todo 每个图需要一个root
         nodes: [],
         links: [],
       }
-      await axios.get('http://www.pandub.cn:8080/network/getRootIdNameByNetId/' + netId)
+      await axios.get('http://localhost:8080/network/getNetworkByNetId/' + netId)
           .then(({ data }) => {
-            __graph_json_data.rootId = data
+            this.netMessages.netName = data.netName
+            this.netMessages.netId = data.netId
+            this.netMessages.rootNodeId = data.rootNodeId
           }).catch(function (err) {
             console.log(err)
           })
       //初始化nodes
       let mp = new Map() //nodeId 到 id 的映射
-      await axios.get('http://www.pandub.cn:8080/node/getNodeListByNetId/' + netId)
+      await axios.get('http://localhost:8080/node/getNodeListByNetId/' + netId)
           .then(({ data }) => {
             for (let i = 0; i < data.length; i++) {
               mp.set(data[i].nodeId, data[i].id)
+              if (data[i].nodeId === this.netMessages.rootNodeId) {
+                __graph_json_data.rootId = data[i].id
+                this.rootNodeId = data[i].id
+              }
               __graph_json_data.nodes.push({
                 id: data[i].id,
                 text: data[i].text,
@@ -116,20 +133,21 @@ export default {
           }).catch(function (err) {
             console.log(err)
           })
-      await axios.get('http://www.pandub.cn:8080/relation/getRelationListByNetId/' + netId)
+      await axios.get('http://localhost:8080/relation/getRelationListByNetId/' + netId)
           .then(({ data }) => {
             for (let i = 0; i < data.length; i++) {
               __graph_json_data.links.push({
                 from: mp.get(data[i].nodeIdFrom),
                 to: mp.get(data[i].nodeIdTo),
                 fontColor: data[i].fontColor,
-                lineShape: data[i].lineShape,
+                lineShape: parseInt(data[i].lineShape),
                 text: data[i].text,
                 lineWidth: data[i].lineWidth,
                 color: data[i].color,
                 data: {
                   content: data[i].content,
-                  from: mp.get(data[i].nodeIdFrom), to: mp.get(data[i].nodeIdTo)
+                  from: mp.get(data[i].nodeIdFrom), to: mp.get(data[i].nodeIdTo),
+                  id: data[i].edgeId,
                 }
               })
             }
@@ -137,7 +155,10 @@ export default {
                 __graph_json_data,
                 (RN) => {
                   //called when the relation-graph is completed
-                  this.onNodeClick(RN.getNodeById(__graph_json_data.rootId))
+                  if (nodeId == null)
+                    this.focusNodeById(this.rootNodeId)
+                  else
+                    this.focusNodeById(nodeId)
                 }
             )
           }).catch(function (err) {
@@ -166,7 +187,7 @@ export default {
 .network-data-box {
   display: flex;
   flex-flow: column nowrap;
-  height: 100%;
+  height: calc(100vh);
   overflow-y: scroll;
   width: 500px;
 }
