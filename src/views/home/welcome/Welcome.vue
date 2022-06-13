@@ -19,19 +19,19 @@ import CategorizedRns from "@/components/CategorizedRns";
 export default {
   name: "Welcome",
   //注册组件
-  components:{SearchBar,CategorizedRns},
-  data(){
-    return{
-      categories:[]
+  components: {SearchBar, CategorizedRns},
+  data() {
+    return {
+      categories: []
     }
   },
-  created () {
-    axios.get('http://localhost:8080/tag/getTags').then(({ data }) => {
-      console.log(data)
-      data.forEach((category)=>{
+  created() {
+    axios.get('http://localhost:8080/tag/getTags').then(({data}) => {
+      //console.log(data)
+      data.forEach((category) => {
         this.categories.push({
-          tagId:category.tagId,
-          tagName:category.tagName
+          tagId: category.tagId,
+          tagName: category.tagName
         })
       })
     })
@@ -50,14 +50,16 @@ export default {
   align-items: center;
   background: #f8f8f8;
 }
-.el-container-search{
+
+.el-container-search {
   background: #ffffff;
   margin: 1% 1% 0 1%;
   width: 80%;
   height: 90px;
   box-shadow: 5px 5px 5px #cccccc;
 }
-.el-container-rns{
+
+.el-container-rns {
   /* 弹性布局 水平、垂直居中 */
   display: flex;
   flex-direction: column;

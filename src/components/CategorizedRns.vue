@@ -1,15 +1,16 @@
 <template>
   <div id="content">
-    <div id="info-wrapper">
-      <div id="category">{{ categories }}</div>
-      <div id="more">
+    <div class="info-wrapper">
+      <div class="category">{{ category.tagName }}</div>
+      <div class="more">
         <!--        <el-button id="rn-more">更多</el-button>-->
         <i class="el-icon-arrow-right"></i>
       </div>
     </div>
-    <div id="rn-wrapper" v-for="rn in rns" :key="rn.netId" net-name="rn.netName" create-time="rn.createTime">
-      <!--todo  以组件的形式进行遍历 未测试 还差数据    -->
-      <RnThumbnail></RnThumbnail>
+    <div class="rn-wrapper">
+      <div v-for="rn in rns" >
+        <RnThumbnail :net-id="rn" @click.native="toNetworkView" ></RnThumbnail>
+      </div>
     </div>
   </div>
 </template>
@@ -20,22 +21,39 @@ import axios from 'axios'
 
 export default {
   name: 'CategorizedRns',
-  components: { RnThumbnail },
-  data () {
+  components: {RnThumbnail},
+  data() {
     return {//保证每一次都是返回全新的
-      categories: '篮球',
       rns: []
     }
   },
 
-  created () {
-
+  created() {
+    this.getRns()
   },
-  props:['category']
+  props: ['category'],
+
+  methods:{
+    getRns(){
+      axios.get('http://localhost:8080/userTag/get/net/'+this.category.tagId).then(({data}) => {
+        data.forEach((rn)=>{
+          this.rns.push(rn)
+        })
+      })
+    },
+    toNetworkView () {
+      this.$router.push({
+        name: 'networkView',
+        query: {
+          netId: this.netId
+        }
+      })
+    },
+  }
 }
 </script>
 
-<style scoped>
+<style>
 #content {
   /* 弹性布局 水平、垂直居中 */
   display: flex;
@@ -45,7 +63,7 @@ export default {
   background: #ffffff;
 }
 
-#info-wrapper {
+.info-wrapper {
   /* 弹性布局 水平、垂直居中 */
   display: flex;
   flex-direction: row;
@@ -55,7 +73,7 @@ export default {
   background: #ffffff;
 }
 
-#category {
+.category {
   width: 64px;
   height: 48px;
   color: rgba(0, 0, 0, 1);
@@ -63,10 +81,10 @@ export default {
   line-height: 150%;
   text-align: center;
   font-weight: bold;
-  margin: 3% 3% 0 5%
+  margin: 1% 0 0 0
 }
 
-#rn-wrapper {
+.rn-wrapper {
   /* 弹性布局 水平、垂直居中 */
   display: flex;
   flex-direction: row;
