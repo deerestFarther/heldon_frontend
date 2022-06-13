@@ -3,12 +3,12 @@
     <div class="img-box">
       <img class="img" :src="imgUrl">
       <div class="btn">
-        <el-button icon="el-icon-view" circle @click="toNetworkView"></el-button>
-        <el-button icon="el-icon-edit-outline" circle @click="toNetworkCreate"></el-button>
-        <el-button icon="el-icon-delete" circle @click="deleteNetwork"></el-button>
+        <el-button icon="el-icon-view" circle @click="toNetworkView" size="small"></el-button>
+        <el-button icon="el-icon-edit-outline" circle @click="toNetworkCreate" size="small"></el-button>
+        <el-button icon="el-icon-delete" circle @click="deleteNetwork" size="small"></el-button>
       </div>
     </div>
-    <div class="net-name">{{ netName }}</div>
+    <div class="net-name" style="padding: 10px 0;">{{ netName }}</div>
   </div>
 </template>
 
@@ -22,20 +22,12 @@ export default {
   },
   methods: {
     toNetworkView () {
-      this.$router.push({
-        name: 'networkView',
-        query: {
-          netId: this.netId
-        }
-      })
+      const net = this.$router.resolve({path: '/networkView', query: {netId: this.netId}})
+      window.open(net.href,'_blank')
     },
     toNetworkCreate () {
-      this.$router.push({
-        name: 'networkCreate',
-        query: {
-          netId: this.netId
-        }
-      })
+      const net = this.$router.resolve({path: '/networkCreate', query: {netId: this.netId}})
+      window.open(net.href,'_blank')
     },
     deleteNetwork () {
       this.$confirm('此操作将永久删除该关系网，是否继续？', '提示', {
@@ -43,7 +35,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        axios.delete('http://www.pandub.cn:8080/network/deleteNetworkByNetId/' + this.netId)
+        axios.delete('http://116.62.36.50:8080/network/deleteNetworkByNetId/' + this.netId)
             .then(({ data }) => {
               this.$message({
                 type: 'success',
@@ -70,14 +62,13 @@ a {
   color: black;
 }
 
+.img{
+  width: 100%;
+}
 
 .img-box {
-  width: 100px;
-  height: 170px;
-  padding: 20px;
-
   .btn {
+    padding: 5px 0;
   }
-
 }
 </style>

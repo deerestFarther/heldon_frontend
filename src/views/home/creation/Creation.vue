@@ -5,12 +5,20 @@
         <user-picture/>
       </el-aside>
       <el-main class="main">
-        <div v-for="item in networkList" :key="item.netId">
-          <network-block :img-url="item.url" :net-id="item.netId" :net-name="item.netName"
-                         @networkDeleted="getNetworkListByUserId"></network-block>
-        </div>
+        <el-row :gutter="20">
+          <el-col :span="6" v-for="item in networkList" :key="item.netId" :offset="index > 0 ? 0.5 : 0" >
+            <el-card :body-style="{ padding: '0px' }">
+              <network-block :img-url="item.url" :net-id="item.netId" :net-name="item.netName"
+                             @networkDeleted="getNetworkListByUserId"></network-block>
+            </el-card>
+          </el-col>
+          <el-col :span="6" v-for="item in 1" :key="item.netId" :offset="index > 0 ? 0.5 : 0" >
+            <el-card :body-style="{ padding: '0px' }">
+              <el-button icon="el-icon-plus" @click="dialogVisible=true" style="width: 100%; height: 290px;}"></el-button>
+            </el-card>
+          </el-col>
+        </el-row>
         <div>
-          <el-button icon="el-icon-plus" @click="dialogVisible=true"></el-button>
           <el-dialog :visible.sync="dialogVisible" width="30%" :close-on-click-modal=false>
 
             <el-form :model="networkForm" status-icon :rules="rules" ref="nodeIdForm" label-width="100px"
@@ -85,7 +93,7 @@ export default {
       data.url = event
     },
     addNewNetwork (netName, tagId, url) {
-      axios.post('http://www.pandub.cn:8080/network/insertNetwork/',
+      axios.post('http://116.62.36.50:8080/network/insertNetwork/',
           {
             netName, tagId,
             userId: sessionStorage.getItem('userId'), url,
@@ -104,7 +112,7 @@ export default {
     },
     getNetworkListByUserId () {
       this.networkList = []
-      axios.get('http://www.pandub.cn:8080/network/getNetworkByUserId/' + sessionStorage.getItem('userId'))
+      axios.get('http://116.62.36.50:8080/network/getNetworkByUserId/' + sessionStorage.getItem('userId'))
           .then(({ data }) => {
             data.forEach((net) => {
               this.networkList.push({
@@ -119,7 +127,7 @@ export default {
           })
     },
     getTags () {
-      axios.get('http://www.pandub.cn:8080/tag/getTags')
+      axios.get('http://116.62.36.50:8080/tag/getTags')
           .then(({ data }) => {
             data.forEach((tag) => {
               this.tagOptions.push({
@@ -142,9 +150,10 @@ export default {
 }
 
 .main {
-  padding: 0;
   margin: 5% 10% 2% 3%;
   background: white;
-  display: flex;
+}
+.el-col-6 {
+  margin-bottom: 20px;
 }
 </style>

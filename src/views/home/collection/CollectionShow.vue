@@ -46,21 +46,23 @@
     </el-header>
     <el-main>
       <el-row :gutter="20" v-show="listsShow">
-        <el-col :span="8" v-for="(o, index) in 3" :key="o" :offset="index > 0 ? 0.5 : 0">
+        <el-col :span="8" v-for="(list,index) in lists" :key="index" :offset="index > 0 ? 0.5 : 0" >
           <el-card :body-style="{ padding: '0px' }">
-            <img src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png" class="image">
+            <div @click="toNetworkView (list.netId)">
+            <img :src="list.ext3" class="image" >
             <div style="padding: 12px;">
-              <div class="bottom clearfix">
-                <div>
-                  <img src="../../../assets/picture/like.png" class="like_at">
-                  <div class="title">200</div>
-                </div>
-                <div>
-                  <img src="../../../assets/picture/at.png" class="like_at">
-                  <div class="title">200</div>
-                </div>
-              </div>
-              <span>{{lists}}</span>
+<!--              <div class="bottom clearfix">-->
+<!--                <div>-->
+<!--                  <img src="../../../assets/picture/like.png" class="like_at">-->
+<!--                  <div class="title">200</div>-->
+<!--                </div>-->
+<!--                <div>-->
+<!--                  <img src="../../../assets/picture/at.png" class="like_at">-->
+<!--                  <div class="title">200</div>-->
+<!--                </div>-->
+<!--              </div>-->
+              <span>{{list.netName}}</span>
+            </div>
             </div>
           </el-card>
         </el-col>
@@ -128,7 +130,6 @@ export default {
   },
   methods:{
     showCollectionInfo(){
-      console.log('t',this.collection_content)
       this.info=this.collection_content
       if(this.info===''){
         this.info="请添加收藏夹信息"
@@ -143,7 +144,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        axios.delete("http://www.pandub.cn:8080/collection/remove/collection/"+this.collection_id
+        axios.delete("http://116.62.36.50:8080/collection/remove/collection/"+this.collection_id
         ).then(({data})=>{
           if (data) {
             this.$message({
@@ -168,7 +169,7 @@ export default {
           this.userid=sessionStorage.getItem('userId')
           console.log('submit!!');
           this.info=this.ruleForm.inf
-          axios.put("http://www.pandub.cn:8080/collection/renew/collection/content/"+this.userid+
+          axios.put("http://116.62.36.50:8080/collection/renew/collection/content/"+this.userid+
               '&&'+ this.collection_id+'&&'+this.ruleForm.inf).then(({data})=>{
             if (data) {
               console.log('info',data)
@@ -193,7 +194,7 @@ export default {
         if (valid) {
           this.userid=sessionStorage.getItem('userId')
           console.log('submit!!');
-          axios.put("http://www.pandub.cn:8080/collection/renew/collection/name/"+this.userid+
+          axios.put("http://116.62.36.50:8080/collection/renew/collection/name/"+this.userid+
               '&&'+ this.collection_id+'&&'+this.collection_name+'&&'+this.ruleForm1.name).then(({data})=>{
             if (data) {
               console.log('info',data)
@@ -207,6 +208,10 @@ export default {
           return false;
          }
       });
+    },
+    toNetworkView (i) {
+      const net = this.$router.resolve({path: '/networkView', query: {netId: i}})
+      window.open(net.href,'_blank')
     },
   }
 }
@@ -282,5 +287,8 @@ export default {
   float: left;
   line-height: 15px;
   font-size: 12px;
+}
+.el-col-8 {
+  margin-bottom: 20px;
 }
 </style>

@@ -73,7 +73,7 @@ export default {
       }else if (!this.checkSpecialKey(value)) {
         callback(new Error("不能含有特殊字符"));
       }else {
-        axios.get("http://www.pandub.cn:8080/authorization/exists/authorization/"+this.ruleForm.account).then(({data})=>{
+        axios.get("http://116.62.36.50:8080/authorization/exists/authorization/"+this.ruleForm.account).then(({data})=>{
           console.log(data)
           if (!data) {
             return callback()
@@ -132,7 +132,7 @@ export default {
   },
     getUser(){
       this.userId=sessionStorage.getItem('userId');
-      axios.get("http://www.pandub.cn:8080/authorization/get/authorizations/"+this.userId).then(({data})=>{
+      axios.get("http://116.62.36.50:8080/authorization/get/authorizations/"+this.userId).then(({data})=>{
         if (data) {
           console.log('users',data)
           this.lastTime=this.stringToDate(data[0].lastloginTime)
@@ -141,7 +141,7 @@ export default {
       }).catch((err) => {
         console.log(err)
       })
-      axios.get("http://www.pandub.cn:8080/user/getInfoByUserId/"+this.userId).then(({data})=>{
+      axios.get("http://116.62.36.50:8080/user/getInfoByUserId/"+this.userId).then(({data})=>{
         if (data) {
           this.userName=data.nickname
           console.log('user',data)
@@ -156,7 +156,7 @@ export default {
         if (valid) {
           let list={nickname: this.ruleForm.account,userId: this.userId,avatar:null,ext3:null}
           console.log(list)
-          axios.post("http://www.pandub.cn:8080/user/edit",list).then(({data})=> {
+          axios.post("http://116.62.36.50:8080/user/edit",list).then(({data})=> {
             console.log(data)
             if(data) {
               this.$notify({
@@ -184,7 +184,7 @@ export default {
         if (valid) {
           let list1={nickname: null ,userId: this.userId,avatar:null,ext3:this.ruleForm1.info}
           console.log(list1)
-          axios.post("http://www.pandub.cn:8080/user/edit",list1).then(({data})=> {
+          axios.post("http://116.62.36.50:8080/user/edit",list1).then(({data})=> {
             console.log(data)
             if(data) {
               this.$notify({
