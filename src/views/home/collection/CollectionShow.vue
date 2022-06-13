@@ -144,7 +144,7 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        axios.delete('http://localhost:8080/collection/remove/collection/' + this.collection_id
+        axios.delete('http://116.62.36.50:8080/collection/remove/collection/' + this.collection_id
         ).then(({ data }) => {
           if (data) {
             this.$message({
@@ -169,7 +169,7 @@ export default {
           this.userid = sessionStorage.getItem('userId')
           console.log('submit!!')
           this.info = this.ruleForm.inf
-          axios.put('http://localhost:8080/collection/renew/collection/content/' + this.userid +
+          axios.put('http://116.62.36.50:8080/collection/renew/collection/content/' + this.userid +
               '&&' + this.collection_id + '&&' + this.ruleForm.inf).then(({ data }) => {
             if (data) {
               console.log('info', data)
@@ -194,7 +194,7 @@ export default {
         if (valid) {
           this.userid = sessionStorage.getItem('userId')
           console.log('submit!!')
-          axios.put('http://localhost:8080/collection/renew/collection/name/' + this.userid +
+          axios.put('http://116.62.36.50:8080/collection/renew/collection/name/' + this.userid +
               '&&' + this.collection_id + '&&' + this.collection_name + '&&' + this.ruleForm1.name).then(({ data }) => {
             if (data) {
               console.log('info', data)

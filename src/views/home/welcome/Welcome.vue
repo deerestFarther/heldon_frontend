@@ -27,7 +27,7 @@ export default {
     }
   },
   created () {
-    axios.get('http://localhost:8080/tag/getTags').then(({ data }) => {
+    axios.get('http://116.62.36.50:8080/tag/getTags').then(({ data }) => {
       //console.log(data)
       data.forEach((category) => {
         this.categories.push({

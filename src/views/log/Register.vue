@@ -44,12 +44,12 @@ export default {
       console.log(value)
       if (!value) {
         return callback(new Error('用户名不能为空'))
-      } else if (value.length < 2 || value.length > 6) {
-        return callback(new Error('用户名长度为2~6位'))
+      } else if (value.length < 6 || value.length > 12) {
+        return callback(new Error('用户名长度为6~12位'))
       } else if (!this.checkSpecialKey(value)) {
         return callback(new Error('不能含有特殊字符'))
       } else {
-        axios.get('http://localhost:8080/authorization/exists/authorization/' + this.ruleForm.account).then(({ data }) => {
+        axios.get('http://116.62.36.50:8080/authorization/exists/authorization/' + this.ruleForm.account).then(({ data }) => {
           console.log(data)
           if (!data) {
             return callback()
@@ -121,7 +121,7 @@ export default {
     submitForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          axios.post('http://localhost:8080/authorization/add/authorization/new/' + '0' + '&&' + this.ruleForm.account
+          axios.post('http://116.62.36.50:8080/authorization/add/authorization/new/' + '0' + '&&' + this.ruleForm.account
               + '&&' + this.ruleForm.pass).then(({ data }) => {
             console.log(data)
             if (data) {

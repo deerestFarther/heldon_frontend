@@ -53,9 +53,9 @@ export default {
 
   methods: {
     getRns () {
-      axios.get('http://localhost:8080/userTag/get/net/' + this.category.tagId).then(({ data }) => {
+      axios.get('http://116.62.36.50:8080/userTag/get/net/' + this.category.tagId).then(({ data }) => {
         data.forEach((rn) => {
-          axios.get('http://localhost:8080/network/getNetworkByNetId/' + rn).then(({ data }) => {
+          axios.get('http://116.62.36.50:8080/network/getNetworkByNetId/' + rn).then(({ data }) => {
             if (data) {
               this.lists.push(data)
             }
