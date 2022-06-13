@@ -1,26 +1,38 @@
 <template>
   <div id="content">
-    <img src="../assets/logo.png" id="rn-thumb"></img>
-    <div id="rn-name">{{netName}}</div>
-    <div id="rn-time">{{createTime}}</div>
+    <img :src="this.netImg" id="rn-thumb"></img>
+    <div id="rn-name">{{ netName }}</div>
+<!--    <div id="rn-time">{{ createTime }}</div>-->
   </div>
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "RnThumbnail",
-  data(){
+  data() {
     return {
-      netName:"全职高手",
-      createTime:"2022-06-01 23:39:18"
+      netName:'',
+      netImg:'',
+      createTime:''
     }
   },
-  props:['netName','createTime']//todo 拿到父组件v-for中的数据，还未测试
+  props: ['netId'],
+  created() {
+    axios.get('http://localhost:8080/network/getNetworkByNetId/'+this.netId).then(({data})=>{
+      if (data){
+        this.netName = data.netName
+        this.netImg = data.ext3
+        this.createTime = data.createTime
+      }
+    })
+  }
 }
 </script>
 
 <style scoped>
-#content{
+#content {
   /* 弹性布局 水平、垂直居中 */
   display: flex;
   flex-direction: column;
@@ -28,9 +40,10 @@ export default {
   align-items: center;
   background: #f8f8f8;
   /*调整组件内部的间距分别对应上、右、下、左*/
-  padding: 0 12% 0 5%;
+  margin: 0 70px 0 30px;
 }
-#rn-thumb{
+
+#rn-thumb {
   width: 180px;
   height: 180px;
 }
