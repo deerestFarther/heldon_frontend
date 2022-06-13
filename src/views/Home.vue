@@ -47,7 +47,7 @@ export default {
     },
     username(){
       this.UserId=sessionStorage.getItem('userId');
-      axios.get("http://localhost:8080/user/getInfoByUserId/"+this.UserId).then(({data})=>{
+      axios.get("http://116.62.36.50:8080/user/getInfoByUserId/"+this.UserId).then(({data})=>{
         if (data) {
           this.UserName=data.nickname
           console.log('user',data.nickname)

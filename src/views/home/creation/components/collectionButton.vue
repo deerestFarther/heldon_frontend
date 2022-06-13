@@ -49,7 +49,7 @@ export default {
   computed: {},
   watch: {
     netId: function () {
-      axios.post('http://localhost:8080/collectionNetwork/add/cn/' + this.netId + '/' + sessionStorage.getItem('userId'))
+      axios.post('http://116.62.36.50:8080/collectionNetwork/add/cn/' + this.netId + '/' + sessionStorage.getItem('userId'))
           .then(({ data }) => {
             console.log(data)
             if (data.length > 0) {
@@ -70,7 +70,7 @@ export default {
   },
   methods: {
     getCollectionList () {
-      axios.get('http://localhost:8080/collection/get/collections/' + sessionStorage.getItem('userId'))
+      axios.get('http://116.62.36.50:8080/collection/get/collections/' + sessionStorage.getItem('userId'))
           .then(({ data }) => {
             this.collectionOptions = []
             data.forEach((col) => {
@@ -91,7 +91,7 @@ export default {
     },
     //收藏
     collect () {
-      axios.post('http://localhost:8080/collectionNetwork/add/cn/' +
+      axios.post('http://116.62.36.50:8080/collectionNetwork/add/cn/' +
           this.collectionId + '&&' + this.netId)
           .then(({ data }) => {
             if (data) {
@@ -120,7 +120,7 @@ export default {
     },
     //取消收藏
     cancelCollect () {
-      axios.delete('http://localhost:8080/collectionNetwork/remove/cn/' + this.containsId)
+      axios.delete('http://116.62.36.50:8080/collectionNetwork/remove/cn/' + this.containsId)
           .then((data) => {
             if (data) {
               this.ifCollected = false

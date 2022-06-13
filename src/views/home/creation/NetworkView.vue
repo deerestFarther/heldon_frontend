@@ -94,7 +94,7 @@ export default {
         nodes: [],
         links: [],
       }
-      await axios.get('http://localhost:8080/network/getNetworkByNetId/' + netId)
+      await axios.get('http://116.62.36.50:8080/network/getNetworkByNetId/' + netId)
           .then(({ data }) => {
             this.netMessages.netName = data.netName
             this.netMessages.netId = data.netId
@@ -104,7 +104,7 @@ export default {
           })
       //初始化nodes
       let mp = new Map() //nodeId 到 id 的映射
-      await axios.get('http://localhost:8080/node/getNodeListByNetId/' + netId)
+      await axios.get('http://116.62.36.50:8080/node/getNodeListByNetId/' + netId)
           .then(({ data }) => {
             for (let i = 0; i < data.length; i++) {
               mp.set(data[i].nodeId, data[i].id)
@@ -133,7 +133,7 @@ export default {
           }).catch(function (err) {
             console.log(err)
           })
-      await axios.get('http://localhost:8080/relation/getRelationListByNetId/' + netId)
+      await axios.get('http://116.62.36.50:8080/relation/getRelationListByNetId/' + netId)
           .then(({ data }) => {
             for (let i = 0; i < data.length; i++) {
               __graph_json_data.links.push({

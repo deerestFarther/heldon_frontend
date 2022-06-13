@@ -44,10 +44,10 @@ export default {
 
   methods:{
     sendRnRequest(){
-      axios.get('http://localhost:8080/')
+      axios.get('http://116.62.36.50:8080/')
     },
     searchRns(){
-      axios.get('http://localhost:8080/user/getInfoByNickname/'+this.keyWord)
+      axios.get('http://116.62.36.50:8080/user/getInfoByNickname/'+this.keyWord)
           .then((data) => {
             console.log(data)
           })
