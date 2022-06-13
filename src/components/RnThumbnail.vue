@@ -40,7 +40,7 @@ export default {
   align-items: center;
   background: #f8f8f8;
   /*调整组件内部的间距分别对应上、右、下、左*/
-  padding: 0 12% 0 5%;
+  margin: 0 70px 0 30px;
 }
 
 #rn-thumb {
