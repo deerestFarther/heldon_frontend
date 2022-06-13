@@ -6,15 +6,16 @@
       </el-aside>
       <el-main class="main">
         <el-row :gutter="20">
-          <el-col :span="6" v-for="item in networkList" :key="item.netId" :offset="index > 0 ? 0.5 : 0" >
+          <el-col :span="6" v-for="item in networkList" :key="item.netId" :offset="index > 0 ? 0.5 : 0">
             <el-card :body-style="{ padding: '0px' }">
               <network-block :img-url="item.url" :net-id="item.netId" :net-name="item.netName"
                              @networkDeleted="getNetworkListByUserId"></network-block>
             </el-card>
           </el-col>
-          <el-col :span="6" v-for="item in 1" :key="item.netId" :offset="index > 0 ? 0.5 : 0" >
+          <el-col :span="6" v-for="item in 1" :key="item.netId" :offset="index > 0 ? 0.5 : 0">
             <el-card :body-style="{ padding: '0px' }">
-              <el-button icon="el-icon-plus" @click="dialogVisible=true" style="width: 100%; height: 290px;}"></el-button>
+              <el-button icon="el-icon-plus" @click="dialogVisible=true"
+                         style="width: 100%; height: 290px;}"></el-button>
             </el-card>
           </el-col>
         </el-row>
@@ -93,26 +94,28 @@ export default {
       data.url = event
     },
     addNewNetwork (netName, tagId, url) {
-      axios.post('http://116.62.36.50:8080/network/insertNetwork/',
-          {
-            netName, tagId,
-            userId: sessionStorage.getItem('userId'), url,
-          })
-          .then(({ data }) => {
-            this.dialogVisible = false
-            this.$message({
-              type: 'success',
-              message: '创建成功!'
+      this.$refs.nodeIdForm.validate((valid) => {
+        axios.post('http://localhost:8080/network/insertNetwork/',
+            {
+              netName, tagId,
+              userId: sessionStorage.getItem('userId'), url,
             })
-            this.getNetworkListByUserId()
-          })
-          .catch((err) => {
-            console.log(err)
-          })
+            .then(({ data }) => {
+              this.dialogVisible = false
+              this.$message({
+                type: 'success',
+                message: '创建成功!'
+              })
+              this.getNetworkListByUserId()
+            })
+            .catch((err) => {
+              console.log(err)
+            })
+      })
     },
     getNetworkListByUserId () {
       this.networkList = []
-      axios.get('http://116.62.36.50:8080/network/getNetworkByUserId/' + sessionStorage.getItem('userId'))
+      axios.get('http://localhost:8080/network/getNetworkByUserId/' + sessionStorage.getItem('userId'))
           .then(({ data }) => {
             data.forEach((net) => {
               this.networkList.push({
@@ -127,7 +130,7 @@ export default {
           })
     },
     getTags () {
-      axios.get('http://116.62.36.50:8080/tag/getTags')
+      axios.get('http://localhost:8080/tag/getTags')
           .then(({ data }) => {
             data.forEach((tag) => {
               this.tagOptions.push({
@@ -153,6 +156,7 @@ export default {
   margin: 5% 10% 2% 3%;
   background: white;
 }
+
 .el-col-6 {
   margin-bottom: 20px;
 }

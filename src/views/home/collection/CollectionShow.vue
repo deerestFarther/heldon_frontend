@@ -46,59 +46,59 @@
     </el-header>
     <el-main>
       <el-row :gutter="20" v-show="listsShow">
-        <el-col :span="8" v-for="(list,index) in lists" :key="index" :offset="index > 0 ? 0.5 : 0" >
-          <el-card :body-style="{ padding: '0px' }">
+        <el-col :span="8" v-for="(list,index) in lists" :key="index" :offset="index > 0 ? 0.5 : 0">
+          <el-card :body-style="{ padding: '0px',cursor:'pointer' }">
             <div @click="toNetworkView (list.netId)">
-            <img :src="list.ext3" class="image" >
-            <div style="padding: 12px;">
-<!--              <div class="bottom clearfix">-->
-<!--                <div>-->
-<!--                  <img src="../../../assets/picture/like.png" class="like_at">-->
-<!--                  <div class="title">200</div>-->
-<!--                </div>-->
-<!--                <div>-->
-<!--                  <img src="../../../assets/picture/at.png" class="like_at">-->
-<!--                  <div class="title">200</div>-->
-<!--                </div>-->
-<!--              </div>-->
-              <span>{{list.netName}}</span>
-            </div>
+              <img :src="list.ext3" class="image">
+              <div style="padding: 12px;">
+                <!--              <div class="bottom clearfix">-->
+                <!--                <div>-->
+                <!--                  <img src="../../../assets/picture/like.png" class="like_at">-->
+                <!--                  <div class="title">200</div>-->
+                <!--                </div>-->
+                <!--                <div>-->
+                <!--                  <img src="../../../assets/picture/at.png" class="like_at">-->
+                <!--                  <div class="title">200</div>-->
+                <!--                </div>-->
+                <!--              </div>-->
+                <span>{{ list.netName }}</span>
+              </div>
             </div>
           </el-card>
         </el-col>
       </el-row>
-      <el-button type="success" round v-show="!listsShow" @click="this.$router.push('/welcome')">去  添  加</el-button>
+      <el-button type="success" round v-show="!listsShow" @click="$router.push('/welcome')">去 添 加</el-button>
     </el-main>
   </el-container>
 </template>
 
 <script>
 
-import axios from "axios";
+import axios from 'axios'
 
 export default {
-  name: "CollectionShow",
-  data(){
+  name: 'CollectionShow',
+  data () {
     var checkInf = (rule, value, callback) => {
-      console.log('s',value)
+      console.log('s', value)
       if (value) {
-        return callback(new Error('用户名不能为空'));
+        return callback(new Error('用户名不能为空'))
       } else
         return callback()
     }
     var checkName = (rule, value, callback) => {
-      console.log('s',value)
+      console.log('s', value)
       if (value) {
-        return callback(new Error('用户名不能为空'));
+        return callback(new Error('用户名不能为空'))
       } else
         return callback()
     }
-    return{
-      inputVisible:false,
-      editVisible:false,
-      reFresh:false,
-      info:'',
-      userid:'',
+    return {
+      inputVisible: false,
+      editVisible: false,
+      reFresh: false,
+      info: '',
+      userid: '',
       ruleForm: {
         inf: '',
       },
@@ -119,38 +119,38 @@ export default {
   },
   props: {
     collection_name: String,
-    collection_id:'',
-    collection_content:'',
-    Delete:Boolean,
-    lists:Array,
-    listsShow:Boolean,
+    collection_id: '',
+    collection_content: '',
+    Delete: Boolean,
+    lists: Array,
+    listsShow: Boolean,
   },
-  mounted() {
+  mounted () {
     this.showCollectionInfo()
   },
-  methods:{
-    showCollectionInfo(){
-      this.info=this.collection_content
-      if(this.info===''){
-        this.info="请添加收藏夹信息"
+  methods: {
+    showCollectionInfo () {
+      this.info = this.collection_content
+      if (this.info === '') {
+        this.info = '请添加收藏夹信息'
       }
-      this.$nextTick(()=>{
+      this.$nextTick(() => {
         this.reFresh = true
       })
     },
-    open() {
+    open () {
       this.$confirm('是否删除该收藏夹?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        axios.delete("http://116.62.36.50:8080/collection/remove/collection/"+this.collection_id
-        ).then(({data})=>{
+        axios.delete('http://localhost:8080/collection/remove/collection/' + this.collection_id
+        ).then(({ data }) => {
           if (data) {
             this.$message({
               type: 'success',
               message: '删除成功!'
-            });
+            })
             location.reload()
           }
         }).catch((err) => {
@@ -160,58 +160,58 @@ export default {
         this.$message({
           type: 'info',
           message: '已取消删除'
-        });
-      });
+        })
+      })
     },
-    submitForm(formName) {
+    submitForm (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.userid=sessionStorage.getItem('userId')
-          console.log('submit!!');
-          this.info=this.ruleForm.inf
-          axios.put("http://116.62.36.50:8080/collection/renew/collection/content/"+this.userid+
-              '&&'+ this.collection_id+'&&'+this.ruleForm.inf).then(({data})=>{
+          this.userid = sessionStorage.getItem('userId')
+          console.log('submit!!')
+          this.info = this.ruleForm.inf
+          axios.put('http://localhost:8080/collection/renew/collection/content/' + this.userid +
+              '&&' + this.collection_id + '&&' + this.ruleForm.inf).then(({ data }) => {
             if (data) {
-              console.log('info',data)
-              this.collection_content=data[0].content
+              console.log('info', data)
+              this.collection_content = data[0].content
             }
           }).catch((err) => {
             console.log(err)
           })
 
           //this.reFresh= false
-          this.$nextTick(()=>{
-            this.inputVisible=false
+          this.$nextTick(() => {
+            this.inputVisible = false
           })
         } else {
-          console.log('error submit!!');
-          return false;
+          console.log('error submit!!')
+          return false
         }
-      });
+      })
     },
-    submitForm1(formName) {
+    submitForm1 (formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-          this.userid=sessionStorage.getItem('userId')
-          console.log('submit!!');
-          axios.put("http://116.62.36.50:8080/collection/renew/collection/name/"+this.userid+
-              '&&'+ this.collection_id+'&&'+this.collection_name+'&&'+this.ruleForm1.name).then(({data})=>{
+          this.userid = sessionStorage.getItem('userId')
+          console.log('submit!!')
+          axios.put('http://localhost:8080/collection/renew/collection/name/' + this.userid +
+              '&&' + this.collection_id + '&&' + this.collection_name + '&&' + this.ruleForm1.name).then(({ data }) => {
             if (data) {
-              console.log('info',data)
+              console.log('info', data)
               location.reload()
             }
           }).catch((err) => {
             console.log(err)
           })
         } else {
-          console.log('error submit!!');
-          return false;
-         }
-      });
+          console.log('error submit!!')
+          return false
+        }
+      })
     },
     toNetworkView (i) {
-      const net = this.$router.resolve({path: '/networkView', query: {netId: i}})
-      window.open(net.href,'_blank')
+      const net = this.$router.resolve({ path: '/networkView', query: { netId: i } })
+      window.open(net.href, '_blank')
     },
   }
 }
@@ -221,34 +221,41 @@ export default {
 .el-form-item {
   margin-bottom: 10px;
 }
+
 .el-button:focus, .el-button:hover {
   border-color: #b9e3d3;
   color: #006e55;
   background-color: #deefe8;
 }
+
 .el-button--primary {
   color: #FFF;
   background-color: #006e55;
   border-color: #006e55;
 }
+
 .el-button--primary:focus, .el-button--primary:hover {
   border-color: #01a57f;
   background-color: #01a57f;
   color: #FFF;
 }
+
 /deep/ .el-input__inner {
   height: 30px;
   line-height: 30px;
   display: flex;
 }
-.el-button+.el-button, .el-checkbox.is-bordered+.el-checkbox.is-bordered {
+
+.el-button + .el-button, .el-checkbox.is-bordered + .el-checkbox.is-bordered {
   margin-left: 50px;
 }
-.button_text{
+
+.button_text {
   float: right;
   padding: 0;
   color: red;
 }
+
 .button_text:focus, .button_text:hover {
   border-color: #fff;
   color: #ff6666;
@@ -279,15 +286,18 @@ export default {
 .clearfix:after {
   clear: both
 }
-.like_at{
+
+.like_at {
   width: 15px;
   float: left;
 }
-.title{
+
+.title {
   float: left;
   line-height: 15px;
   font-size: 12px;
 }
+
 .el-col-8 {
   margin-bottom: 20px;
 }
