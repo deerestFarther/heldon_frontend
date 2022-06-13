@@ -1,15 +1,14 @@
 <template>
   <div id="content">
     <div id="info-wrapper">
-      <div id="category">{{ categories }}</div>
+      <div id="category">{{ category.tagName }}</div>
       <div id="more">
         <!--        <el-button id="rn-more">更多</el-button>-->
         <i class="el-icon-arrow-right"></i>
       </div>
     </div>
-    <div id="rn-wrapper" v-for="rn in rns" :key="rn.netId" net-name="rn.netName" create-time="rn.createTime">
-      <!--todo  以组件的形式进行遍历 未测试 还差数据    -->
-      <RnThumbnail></RnThumbnail>
+    <div id="rn-wrapper" v-for="rn in rns" >
+      <RnThumbnail :net-id="rn"></RnThumbnail>
     </div>
   </div>
 </template>
@@ -20,18 +19,27 @@ import axios from 'axios'
 
 export default {
   name: 'CategorizedRns',
-  components: { RnThumbnail },
-  data () {
+  components: {RnThumbnail},
+  data() {
     return {//保证每一次都是返回全新的
-      categories: '篮球',
       rns: []
     }
   },
 
-  created () {
-
+  created() {
+    this.getRns()
   },
-  props:['category']
+  props: ['category'],
+
+  methods:{
+    getRns(){
+      axios.get('http://localhost:8080/userTag/get/net/'+this.category.tagId).then(({data}) => {
+        data.forEach((rn)=>{
+          this.rns.push(rn)
+        })
+      })
+    }
+  }
 }
 </script>
 
