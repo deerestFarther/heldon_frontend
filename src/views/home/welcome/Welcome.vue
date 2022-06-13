@@ -1,32 +1,33 @@
 <template>
   <div id="content">
-    <el-container class="el-container-search" id="search">
+    <div class="el-container-search" id="search">
       <SearchBar/>
-    </el-container>
-    <el-container class="el-container-rns" id="rns-wrapper" v-for="item in categories">
-      <CategorizedRns :category="item"/>
-    </el-container>
-
+    </div>
+    <div class="el-container-rns" id="rns-wrapper">
+      <div v-for="item in categories">
+        <CategorizedRns :category="item"/>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
 //引入组件
-import SearchBar from "@/components/SearchBar";
-import CategorizedRns from "@/components/CategorizedRns";
+import SearchBar from '@/components/SearchBar'
+import CategorizedRns from '@/components/CategorizedRns'
 
 export default {
-  name: "Welcome",
+  name: 'Welcome',
   //注册组件
-  components: {SearchBar, CategorizedRns},
-  data() {
+  components: { SearchBar, CategorizedRns },
+  data () {
     return {
       categories: []
     }
   },
-  created() {
-    axios.get('http://localhost:8080/tag/getTags').then(({data}) => {
+  created () {
+    axios.get('http://localhost:8080/tag/getTags').then(({ data }) => {
       //console.log(data)
       data.forEach((category) => {
         this.categories.push({
@@ -63,8 +64,6 @@ export default {
   /* 弹性布局 水平、垂直居中 */
   display: flex;
   flex-direction: column;
-  justify-content: left;
-  align-items: flex-start;
   background: #ffffff;
   margin: 1% 1% 0 1%;
   width: 80%;

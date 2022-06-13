@@ -86,7 +86,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 #searchbar{
   /* 弹性布局 水平、垂直居中 */
   display: flex;
